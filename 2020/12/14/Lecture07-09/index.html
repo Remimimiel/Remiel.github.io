@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Visibility &#x2F; Occlusion 可见&#x2F;不可见（光栅化中的内容）油画家算法：从远到近画，新画的覆盖老的 但无法处理物体互相遮挡的情况 Z-Buffer 深度缓冲主要思想：  对每个像素排远近顺序，存储z坐标 需要两个缓冲区 一个帧缓冲区记录颜色信息 一个深度缓冲区 (z-buffer) 记录深度信息    为了简化问题，认为深度为点到摄像机的距离，全为正 Z-Buffer 例子 远的深">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lecture 07-09 Shading 着色">
+<meta property="og:url" content="http://example.com/2020/12/14/Lecture07-09/index.html">
+<meta property="og:site_name" content="Remiel">
+<meta property="og:description" content="Visibility &#x2F; Occlusion 可见&#x2F;不可见（光栅化中的内容）油画家算法：从远到近画，新画的覆盖老的 但无法处理物体互相遮挡的情况 Z-Buffer 深度缓冲主要思想：  对每个像素排远近顺序，存储z坐标 需要两个缓冲区 一个帧缓冲区记录颜色信息 一个深度缓冲区 (z-buffer) 记录深度信息    为了简化问题，认为深度为点到摄像机的距离，全为正 Z-Buffer 例子 远的深">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/01.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/02.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/03.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/04.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/05.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/06.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/07.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/08.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/09.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/10.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/11.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/12.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/13.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/14.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/15.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/16.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/17.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/18.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/19.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/20.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/21.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/22.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/23.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/24.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/25.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/26.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/27.png">
+<meta property="og:image" content="http://example.com/images/Lecture07-09/28.png">
+<meta property="article:published_time" content="2020-12-14T12:04:14.000Z">
+<meta property="article:modified_time" content="2020-12-14T13:27:28.370Z">
+<meta property="article:author" content="Remiel">
+<meta property="article:tag" content="图形学 GAMES101">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/Lecture07-09/01.png">
+
+<link rel="canonical" href="http://example.com/2020/12/14/Lecture07-09/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Lecture 07-09 Shading 着色 | Remiel</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Remiel</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/14/Lecture07-09/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Remiel">
+      <meta itemprop="description" content="Remiel's blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Remiel">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lecture 07-09 Shading 着色
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-14 20:04:14 / 修改时间：21:27:28" itemprop="dateCreated datePublished" datetime="2020-12-14T20:04:14+08:00">2020-12-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Visibility-Occlusion-可见-不可见（光栅化中的内容）"><a href="#Visibility-Occlusion-可见-不可见（光栅化中的内容）" class="headerlink" title="Visibility / Occlusion 可见/不可见（光栅化中的内容）"></a>Visibility / Occlusion 可见/不可见（光栅化中的内容）</h1><p>油画家算法：从远到近画，新画的覆盖老的</p>
+<p>但无法处理物体互相遮挡的情况</p>
+<h2 id="Z-Buffer-深度缓冲"><a href="#Z-Buffer-深度缓冲" class="headerlink" title="Z-Buffer 深度缓冲"></a>Z-Buffer 深度缓冲</h2><p>主要思想：</p>
+<ul>
+<li>对每个像素排远近顺序，存储z坐标</li>
+<li>需要两个缓冲区<ul>
+<li>一个帧缓冲区记录颜色信息</li>
+<li>一个深度缓冲区 (z-buffer) 记录深度信息</li>
+</ul>
+</li>
+</ul>
+<p>为了简化问题，认为深度为点到摄像机的距离，全为正</p>
+<h3 id="Z-Buffer-例子"><a href="#Z-Buffer-例子" class="headerlink" title="Z-Buffer 例子"></a>Z-Buffer 例子</h3><p><img src="/images/Lecture07-09/01.png" alt="avatar"></p>
+<p>远的深度大，颜色白</p>
+<p>进的深度小，颜色黑</p>
+<p>要画的深度小于已经画了的深度，则需要把深度更新为更浅的深度</p>
+<h3 id="Z-Buffer-算法"><a href="#Z-Buffer-算法" class="headerlink" title="Z-Buffer 算法"></a>Z-Buffer 算法</h3><p>深度缓存的核心思想：每一个像素内记录最浅深度</p>
+<p>一开始记录无限远</p>
+<p>在光栅化过程中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (each triangle T)</span><br><span class="line">	<span class="keyword">for</span> (each sample (x,y,z) in T)</span><br><span class="line">		<span class="keyword">if</span> (z &lt; zbuffer[x,y])					<span class="comment">// closest sample so far</span></span><br><span class="line">      framebuffer[x,y] = rgb;			<span class="comment">// update color</span></span><br><span class="line">			zbuffer[x,y] = z;						<span class="comment">// update depth</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      ;								<span class="comment">// do nothing, this sample is occluded</span></span><br></pre></td></tr></table></figure>
+<p>图示（R表示无限大的值）：</p>
+<p>深度缓存发生在每一个像素内</p>
+<p><img src="/images/Lecture07-09/02.png" alt="avatar"></p>
+<h1 id="Shading-着色"><a href="#Shading-着色" class="headerlink" title="Shading 着色"></a>Shading 着色</h1><p>定义：对不同物体应用不同颜色，引入明暗和颜色的不同，以及材质的不同</p>
+<h2 id="Blinn-Phong-Reflectance-Model-反射模型"><a href="#Blinn-Phong-Reflectance-Model-反射模型" class="headerlink" title="Blinn-Phong Reflectance Model 反射模型"></a>Blinn-Phong Reflectance Model 反射模型</h2><p>反射分为三个部分：</p>
+<ul>
+<li>高光</li>
+<li>漫反射</li>
+<li>环境光照</li>
+</ul>
+<p><img src="/images/Lecture07-09/03.png" alt="avatar"></p>
+<p>着色为逐点进行</p>
+<p><img src="/images/Lecture07-09/04.png" alt="avatar"></p>
+<p>区分Shading和Shadow，Shading没有阴影</p>
+<h3 id="Diffuse-Reflection-漫反射"><a href="#Diffuse-Reflection-漫反射" class="headerlink" title="Diffuse Reflection 漫反射"></a>Diffuse Reflection 漫反射</h3><p><img src="/images/Lecture07-09/05.png" alt="avatar"></p>
+<p>Lanbert’s 余弦定律：接收到的能量与光照方向和法线方向夹角的余弦成正比</p>
+<p>夹角余弦为 $\cos\theta=l\cdot n$</p>
+<p>其中 $l$ 和 $n$ 均为单位向量</p>
+<p>使用该定理计算单位面积上接收到的光的多少</p>
+<p><img src="/images/Lecture07-09/06.png" alt="avatar"></p>
+<p>计算某处距离的光能</p>
+<p><img src="/images/Lecture07-09/07.png" alt="avatar"></p>
+<p>$k_d$ 为系数（颜色材质等）</p>
+<p>$max$ 是为了去掉负数</p>
+<p><strong>漫反射项与观测方向 $v$ 无关</strong></p>
+<h3 id="Specular-Term-高光"><a href="#Specular-Term-高光" class="headerlink" title="Specular Term 高光"></a>Specular Term 高光</h3><p><strong>强度与观测方向有关</strong></p>
+<p>观测方向 $v$ 和镜面反射方向 $R$ 接近的时候能看见高光</p>
+<p><img src="/images/Lecture07-09/08.png" alt="avatar"></p>
+<p>使用半程向量 $h$ 判断能否观察到镜面反射</p>
+<p>法线 $n$ 和半程向量 $h$ 接近则能看到高光，判断接近的方式是两向量点乘是否接近1</p>
+<p><img src="/images/Lecture07-09/09.png" alt="avatar"></p>
+<p>指数 $p$ 的作用：指数p降低容忍度，使两个方向只要离的稍微远一点，就不算接近</p>
+<p><img src="/images/Lecture07-09/10.png" alt="avatar"></p>
+<p><img src="/images/Lecture07-09/11.png" alt="avatar"></p>
+<h3 id="Ambient-Term-环境光照"><a href="#Ambient-Term-环境光照" class="headerlink" title="Ambient Term 环境光照"></a>Ambient Term 环境光照</h3><p><strong>与外界无关</strong></p>
+<p>假设环境光各个方向均相同</p>
+<p><img src="/images/Lecture07-09/12.png" alt="avatar"></p>
+<h3 id="Blinn-Phong-Reflection-Model-反射模型公式"><a href="#Blinn-Phong-Reflection-Model-反射模型公式" class="headerlink" title="Blinn-Phong Reflection Model 反射模型公式"></a>Blinn-Phong Reflection Model 反射模型公式</h3><p><img src="/images/Lecture07-09/13.png" alt="avatar"></p>
+<h2 id="Shading-Frequencies-着色频率"><a href="#Shading-Frequencies-着色频率" class="headerlink" title="Shading Frequencies 着色频率"></a>Shading Frequencies 着色频率</h2><p><img src="/images/Lecture07-09/14.png" alt="avatar"></p>
+<h3 id="Shade-each-triangle-flat-shading-逐三角形着色"><a href="#Shade-each-triangle-flat-shading-逐三角形着色" class="headerlink" title="Shade each triangle (flat shading) 逐三角形着色"></a>Shade each triangle (flat shading) 逐三角形着色</h3><ul>
+<li>三角形两边做叉积求法线，着色</li>
+<li>对光滑表面效果不好</li>
+</ul>
+<p><img src="/images/Lecture07-09/15.png" alt="avatar"></p>
+<h3 id="Shade-each-vertex-Gouraud-shading-逐顶点着色"><a href="#Shade-each-vertex-Gouraud-shading-逐顶点着色" class="headerlink" title="Shade each vertex (Gouraud shading) 逐顶点着色"></a>Shade each vertex (Gouraud shading) 逐顶点着色</h3><ul>
+<li>求三角形顶点法线，每个顶点着色</li>
+<li>三角形内部像素用插值着色</li>
+</ul>
+<p><img src="/images/Lecture07-09/16.png" alt="avatar"></p>
+<h3 id="Shade-each-pixel-Phong-shading-逐像素着色"><a href="#Shade-each-pixel-Phong-shading-逐像素着色" class="headerlink" title="Shade each pixel (Phong shading) 逐像素着色"></a>Shade each pixel (Phong shading) 逐像素着色</h3><ul>
+<li>对每个像素着色</li>
+<li>区分Blinn-Phong着色模型和着色频率</li>
+</ul>
+<p><img src="/images/Lecture07-09/17.png" alt="avatar"></p>
+<p>增加面数，不同着色频率表现会有变化</p>
+<p><img src="/images/Lecture07-09/18.png" alt="avatar"></p>
+<p>如何求逐顶点的法线：</p>
+<ul>
+<li>顶点的法线即相邻面的法线求平均</li>
+<li>$N_v=\frac{\sum_iN_i}{|\sum_i|N_i}$</li>
+</ul>
+<p><img src="/images/Lecture07-09/19.png" alt="avatar"></p>
+<p>如何求逐像素的法线：</p>
+<ul>
+<li>给出顶点的法线，插值出中间的法线</li>
+</ul>
+<p>需要归一化成单位向量</p>
+<p><img src="/images/Lecture07-09/20.png" alt="avatar"></p>
+<h3 id="Graphics-Real-time-Rendering-Pipeline-图形管线（实时渲染管线）"><a href="#Graphics-Real-time-Rendering-Pipeline-图形管线（实时渲染管线）" class="headerlink" title="Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）"></a>Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）</h3><p><img src="/images/Lecture07-09/21.png" alt="avatar"></p>
+<p><img src="/images/Lecture07-09/22.png" alt="avatar"></p>
+<p><img src="/images/Lecture07-09/23.png" alt="avatar"></p>
+<p><img src="/images/Lecture07-09/24.png" alt="avatar"></p>
+<p><img src="/images/Lecture07-09/25.png" alt="avatar"></p>
+<p><img src="/images/Lecture07-09/26.png" alt="avatar"></p>
+<h3 id="Texture-Mapping-纹理映射"><a href="#Texture-Mapping-纹理映射" class="headerlink" title="Texture Mapping 纹理映射"></a>Texture Mapping 纹理映射</h3><p>内部填充图，定义任意点的不同属性</p>
+<p>任意三维物体的表面是二维的</p>
+<p>纹理就是一张图，放到物体表面即映射</p>
+<p><img src="/images/Lecture07-09/27.png" alt="avatar"></p>
+<p>三角形上的任意一个顶点都规定了纹理上的坐标</p>
+<h4 id="uv坐标"><a href="#uv坐标" class="headerlink" title="uv坐标"></a>uv坐标</h4><p><img src="/images/Lecture07-09/28.png" alt="avatar"></p>
+<p>三角形的三个顶点，每一个顶点对应一个uv</p>
+<p>Tileable textures 可无缝衔接纹理</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6-GAMES101/" rel="tag"># 图形学 GAMES101</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/14/Lecture05-06/" rel="prev" title="Lecture 05-06 Rasterization 光栅化">
+      <i class="fa fa-chevron-left"></i> Lecture 05-06 Rasterization 光栅化
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Visibility-Occlusion-%E5%8F%AF%E8%A7%81-%E4%B8%8D%E5%8F%AF%E8%A7%81%EF%BC%88%E5%85%89%E6%A0%85%E5%8C%96%E4%B8%AD%E7%9A%84%E5%86%85%E5%AE%B9%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">Visibility &#x2F; Occlusion 可见&#x2F;不可见（光栅化中的内容）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Z-Buffer-%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%86%B2"><span class="nav-number">1.1.</span> <span class="nav-text">Z-Buffer 深度缓冲</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Z-Buffer-%E4%BE%8B%E5%AD%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">Z-Buffer 例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Z-Buffer-%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.2.</span> <span class="nav-text">Z-Buffer 算法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shading-%E7%9D%80%E8%89%B2"><span class="nav-number">2.</span> <span class="nav-text">Shading 着色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Blinn-Phong-Reflectance-Model-%E5%8F%8D%E5%B0%84%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">Blinn-Phong Reflectance Model 反射模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Diffuse-Reflection-%E6%BC%AB%E5%8F%8D%E5%B0%84"><span class="nav-number">2.1.1.</span> <span class="nav-text">Diffuse Reflection 漫反射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Specular-Term-%E9%AB%98%E5%85%89"><span class="nav-number">2.1.2.</span> <span class="nav-text">Specular Term 高光</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ambient-Term-%E7%8E%AF%E5%A2%83%E5%85%89%E7%85%A7"><span class="nav-number">2.1.3.</span> <span class="nav-text">Ambient Term 环境光照</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blinn-Phong-Reflection-Model-%E5%8F%8D%E5%B0%84%E6%A8%A1%E5%9E%8B%E5%85%AC%E5%BC%8F"><span class="nav-number">2.1.4.</span> <span class="nav-text">Blinn-Phong Reflection Model 反射模型公式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shading-Frequencies-%E7%9D%80%E8%89%B2%E9%A2%91%E7%8E%87"><span class="nav-number">2.2.</span> <span class="nav-text">Shading Frequencies 着色频率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-triangle-flat-shading-%E9%80%90%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9D%80%E8%89%B2"><span class="nav-number">2.2.1.</span> <span class="nav-text">Shade each triangle (flat shading) 逐三角形着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-vertex-Gouraud-shading-%E9%80%90%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2"><span class="nav-number">2.2.2.</span> <span class="nav-text">Shade each vertex (Gouraud shading) 逐顶点着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-pixel-Phong-shading-%E9%80%90%E5%83%8F%E7%B4%A0%E7%9D%80%E8%89%B2"><span class="nav-number">2.2.3.</span> <span class="nav-text">Shade each pixel (Phong shading) 逐像素着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Graphics-Real-time-Rendering-Pipeline-%E5%9B%BE%E5%BD%A2%E7%AE%A1%E7%BA%BF%EF%BC%88%E5%AE%9E%E6%97%B6%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%EF%BC%89"><span class="nav-number">2.2.4.</span> <span class="nav-text">Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Texture-Mapping-%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84"><span class="nav-number">2.2.5.</span> <span class="nav-text">Texture Mapping 纹理映射</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#uv%E5%9D%90%E6%A0%87"><span class="nav-number">2.2.5.1.</span> <span class="nav-text">uv坐标</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Remiel</p>
+  <div class="site-description" itemprop="description">Remiel's blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Remiel</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
