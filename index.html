@@ -171,10 +171,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-12-14 20:04:14 / 修改时间：22:00:23" itemprop="dateCreated datePublished" datetime="2020-12-14T20:04:14+08:00">2020-12-14</time>
+              <time title="创建时间：2020-12-14 20:04:14" itemprop="dateCreated datePublished" datetime="2020-12-14T20:04:14+08:00">2020-12-14</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-21 21:23:43" itemprop="dateModified" datetime="2020-12-21T21:23:43+08:00">2020-12-21</time>
+              </span>
 
           
 
@@ -289,7 +295,60 @@
 <h4 id="uv坐标"><a href="#uv坐标" class="headerlink" title="uv坐标"></a>uv坐标</h4><p><img src="/images/Lecture07-09/28.png" alt="avatar"></p>
 <p>三角形的三个顶点，每一个顶点对应一个uv</p>
 <p>Tileable textures 可无缝衔接纹理</p>
-
+<h3 id="重心坐标-Barycentric-Coordinates"><a href="#重心坐标-Barycentric-Coordinates" class="headerlink" title="重心坐标 Barycentric Coordinates"></a>重心坐标 Barycentric Coordinates</h3><p>对于平面上的三角形内的任意一点：</p>
+<script type="math/tex; mode=display">
+(x,y)=\alpha A+\beta B+\gamma C \\
+\alpha+\beta+\gamma=1</script><p>其中$\alpha、\beta、\gamma$均为非负数</p>
+<h3 id="Applying-Textures-应用纹理"><a href="#Applying-Textures-应用纹理" class="headerlink" title="Applying Textures 应用纹理"></a>Applying Textures 应用纹理</h3><ol>
+<li>找像素中心</li>
+<li>找纹理坐标uv</li>
+<li>求出纹理坐标上的值是多少</li>
+<li>将像素的值设为纹理坐标上的值texcolor</li>
+</ol>
+<h3 id="Texture-Magnification-纹理放大-如果纹理太小"><a href="#Texture-Magnification-纹理放大-如果纹理太小" class="headerlink" title="Texture Magnification 纹理放大 如果纹理太小"></a>Texture Magnification 纹理放大 如果纹理太小</h3><p>纹理太小，分辨率太大，任意一个点查询纹理会查到非整数的值。此处研究非整数的值应该怎么处理。</p>
+<h4 id="Nearest-四舍五入（就近）"><a href="#Nearest-四舍五入（就近）" class="headerlink" title="Nearest 四舍五入（就近）"></a>Nearest 四舍五入（就近）</h4><h4 id="Bilinear-Interpolation-双线性插值"><a href="#Bilinear-Interpolation-双线性插值" class="headerlink" title="Bilinear Interpolation 双线性插值"></a>Bilinear Interpolation 双线性插值</h4><p>找最近的四个点</p>
+<p>一维线性插值公式：</p>
+<script type="math/tex; mode=display">
+lerp(x,v_0,v_1)=v_0+x(v_1-v_0)</script><p>先通过插值算水平方向上下两黑点的值</p>
+<script type="math/tex; mode=display">
+u_0=lerp(s,u_{00},u_{10})\\
+u_1=lerp(s,u_{01},u_{11})</script><p>再通过插值计算竖直方向上刚刚得到的两黑点之间的插值，得到红点的值</p>
+<script type="math/tex; mode=display">
+f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="avatar"></p>
+<p>双线性插值相比一些更高质量的方法略有逊色</p>
+<h4 id="Bicubic-双向三次插值"><a href="#Bicubic-双向三次插值" class="headerlink" title="Bicubic 双向三次插值"></a>Bicubic 双向三次插值</h4><p>取周围邻近16个点</p>
+<p>运算量更大，但结果更好</p>
+<h3 id="Texture-Magnification-如果纹理太大"><a href="#Texture-Magnification-如果纹理太大" class="headerlink" title="Texture Magnification 如果纹理太大"></a>Texture Magnification 如果纹理太大</h3><p>纹理太大问题更严重</p>
+<p>如果按照普通的步骤将纹理的值写回像素，会遇到摩尔纹、锯齿等走样问题</p>
+<p>近处像素覆盖的纹理区域小，远处像素覆盖纹理区域大，因此远处如果认为一个像素的值为纹理的平均值，会走样（Lec9 PPT P30 结合图片理解）</p>
+<p>超采样可以解决，但代价太大</p>
+<ul>
+<li>走样是因为信号变化过快，采样频率跟不上</li>
+<li>在一个像素内纹理变化很多</li>
+<li>更高的采样率可以解决问题</li>
+</ul>
+<p>另一个思路：不采样，立刻知道区域中平均值</p>
+<h3 id="Mipmap"><a href="#Mipmap" class="headerlink" title="Mipmap"></a>Mipmap</h3><p>快、近似的、正方形的范围查询</p>
+<p><img src="/images/Lecture07-09/30.png" alt="avatar"></p>
+<p>如上图<strong>存储</strong>很多层的mipmap</p>
+<p>从原始图像直到变成一个像素</p>
+<p>依次堆叠如同金字塔，因此在计算机视觉中被称为image pyramid</p>
+<p>仅占用额外的1/3存储</p>
+<h4 id="如何计算当前像素在第几层？"><a href="#如何计算当前像素在第几层？" class="headerlink" title="如何计算当前像素在第几层？"></a>如何计算当前像素在第几层？</h4><p>将屏幕上一个像素映射到纹理坐标上，计算这个像素在纹理坐标上的边长</p>
+<p>此处边长L是如下图近似获得的</p>
+<p>设层数为D，纹理坐标上边长为L，LxL的正方形一定会在D层对应到一个像素大小</p>
+<p><img src="/images/Lecture07-09/31.png" alt="avatar"></p>
+<p>放到屏幕上，离得近则要在mipmap很低层查询，显示出的细节较多；离得远则在高层查询</p>
+<h4 id="如果要查询非整数层怎么做？三线性插值-Trilinear-Interprolation"><a href="#如果要查询非整数层怎么做？三线性插值-Trilinear-Interprolation" class="headerlink" title="如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation"></a>如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation</h4><p>先在层内双线性插值，再在层间插值</p>
+<p>据此，不同的区域可以获得连续变化的结果</p>
+<h4 id="Overblur-过分模糊"><a href="#Overblur-过分模糊" class="headerlink" title="Overblur 过分模糊"></a>Overblur 过分模糊</h4><h3 id="Anisotropic-Filtering-各向异性过滤"><a href="#Anisotropic-Filtering-各向异性过滤" class="headerlink" title="Anisotropic Filtering 各向异性过滤"></a>Anisotropic Filtering 各向异性过滤</h3><p>Ripmap</p>
+<p>可以解决矩形区域问题，解决不了斜着的区域问题</p>
+<p>mipmap计算的图片长宽比不变（对角线上的图），各向异性过滤会计算不均匀的水平和竖直方向压缩</p>
+<p><img src="/images/Lecture07-09/32.png" alt="avatar"></p>
+<p>屏幕上一个像素映射到纹理上不一定是正方形，所以会造成overblur</p>
+<p>如果使用各向异性过滤，则遇到长条矩形区域依然可以进行范围查询</p>
+<p>各向异性过滤开销是mipmap的三倍</p>
+<h4 id="EWA-filtering"><a href="#EWA-filtering" class="headerlink" title="EWA filtering"></a>EWA filtering</h4>
       
     </div>
 
