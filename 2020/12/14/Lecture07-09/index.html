@@ -20,15 +20,13 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Visibility &#x2F; Occlusion 可见&#x2F;不可见（光栅化中的内容）油画家算法：从远到近画，新画的覆盖老的 但无法处理物体互相遮挡的情况 Z-Buffer 深度缓冲主要思想：  对每个像素排远近顺序，存储z坐标 需要两个缓冲区 一个帧缓冲区记录颜色信息 一个深度缓冲区 (z-buffer) 记录深度信息    为了简化问题，认为深度为点到摄像机的距离，全为正 Z-Buffer 例子 远的深">
+  <meta name="description" content="本节主要介绍着色（shading），Blinn-Phong反射模型，着色频率，图形管线，纹理映射，重心坐标，插值，mipmap，各向异性过滤">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Lecture 07-09 Shading 着色">
 <meta property="og:url" content="http://example.com/2020/12/14/Lecture07-09/index.html">
 <meta property="og:site_name" content="Remiel">
-<meta property="og:description" content="Visibility &#x2F; Occlusion 可见&#x2F;不可见（光栅化中的内容）油画家算法：从远到近画，新画的覆盖老的 但无法处理物体互相遮挡的情况 Z-Buffer 深度缓冲主要思想：  对每个像素排远近顺序，存储z坐标 需要两个缓冲区 一个帧缓冲区记录颜色信息 一个深度缓冲区 (z-buffer) 记录深度信息    为了简化问题，认为深度为点到摄像机的距离，全为正 Z-Buffer 例子 远的深">
+<meta property="og:description" content="本节主要介绍着色（shading），Blinn-Phong反射模型，着色频率，图形管线，纹理映射，重心坐标，插值，mipmap，各向异性过滤">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/Lecture07-09/01.png">
-<meta property="og:image" content="http://example.com/images/Lecture07-09/02.png">
 <meta property="og:image" content="http://example.com/images/Lecture07-09/03.png">
 <meta property="og:image" content="http://example.com/images/Lecture07-09/04.png">
 <meta property="og:image" content="http://example.com/images/Lecture07-09/05.png">
@@ -60,11 +58,12 @@
 <meta property="og:image" content="http://example.com/images/Lecture07-09/31.png">
 <meta property="og:image" content="http://example.com/images/Lecture07-09/32.png">
 <meta property="article:published_time" content="2020-12-14T12:04:14.000Z">
-<meta property="article:modified_time" content="2020-12-21T13:23:43.500Z">
+<meta property="article:modified_time" content="2020-12-22T08:25:31.521Z">
 <meta property="article:author" content="Remiel">
-<meta property="article:tag" content="图形学 GAMES101">
+<meta property="article:tag" content="图形学">
+<meta property="article:tag" content="GAMES101">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/Lecture07-09/01.png">
+<meta name="twitter:image" content="http://example.com/images/Lecture07-09/03.png">
 
 <link rel="canonical" href="http://example.com/2020/12/14/Lecture07-09/">
 
@@ -214,10 +213,11 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-21 21:23:43" itemprop="dateModified" datetime="2020-12-21T21:23:43+08:00">2020-12-21</time>
+                <time title="修改时间：2020-12-22 16:25:31" itemprop="dateModified" datetime="2020-12-22T16:25:31+08:00">2020-12-22</time>
               </span>
 
           
+            <div class="post-description">本节主要介绍着色（shading），Blinn-Phong反射模型，着色频率，图形管线，纹理映射，重心坐标，插值，mipmap，各向异性过滤</div>
 
         </div>
       </header>
@@ -228,30 +228,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Visibility-Occlusion-可见-不可见（光栅化中的内容）"><a href="#Visibility-Occlusion-可见-不可见（光栅化中的内容）" class="headerlink" title="Visibility / Occlusion 可见/不可见（光栅化中的内容）"></a>Visibility / Occlusion 可见/不可见（光栅化中的内容）</h1><p>油画家算法：从远到近画，新画的覆盖老的</p>
-<p>但无法处理物体互相遮挡的情况</p>
-<h2 id="Z-Buffer-深度缓冲"><a href="#Z-Buffer-深度缓冲" class="headerlink" title="Z-Buffer 深度缓冲"></a>Z-Buffer 深度缓冲</h2><p>主要思想：</p>
-<ul>
-<li>对每个像素排远近顺序，存储z坐标</li>
-<li>需要两个缓冲区<ul>
-<li>一个帧缓冲区记录颜色信息</li>
-<li>一个深度缓冲区 (z-buffer) 记录深度信息</li>
-</ul>
-</li>
-</ul>
-<p>为了简化问题，认为深度为点到摄像机的距离，全为正</p>
-<h3 id="Z-Buffer-例子"><a href="#Z-Buffer-例子" class="headerlink" title="Z-Buffer 例子"></a>Z-Buffer 例子</h3><p><img src="/images/Lecture07-09/01.png" alt="avatar"></p>
-<p>远的深度大，颜色白</p>
-<p>进的深度小，颜色黑</p>
-<p>要画的深度小于已经画了的深度，则需要把深度更新为更浅的深度</p>
-<h3 id="Z-Buffer-算法"><a href="#Z-Buffer-算法" class="headerlink" title="Z-Buffer 算法"></a>Z-Buffer 算法</h3><p>深度缓存的核心思想：每一个像素内记录最浅深度</p>
-<p>一开始记录无限远</p>
-<p>在光栅化过程中：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (each triangle T)</span><br><span class="line">	<span class="keyword">for</span> (each sample (x,y,z) in T)</span><br><span class="line">		<span class="keyword">if</span> (z &lt; zbuffer[x,y])					<span class="comment">// closest sample so far</span></span><br><span class="line">      framebuffer[x,y] = rgb;			<span class="comment">// update color</span></span><br><span class="line">			zbuffer[x,y] = z;						<span class="comment">// update depth</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      ;								<span class="comment">// do nothing, this sample is occluded</span></span><br></pre></td></tr></table></figure>
-<p>图示（R表示无限大的值）：</p>
-<p>深度缓存发生在每一个像素内</p>
-<p><img src="/images/Lecture07-09/02.png" alt="avatar"></p>
-<h1 id="Shading-着色"><a href="#Shading-着色" class="headerlink" title="Shading 着色"></a>Shading 着色</h1><p>定义：对不同物体应用不同颜色，引入明暗和颜色的不同，以及材质的不同</p>
+        <h1 id="Shading-着色"><a href="#Shading-着色" class="headerlink" title="Shading 着色"></a>Shading 着色</h1><p>定义：对不同物体应用不同颜色，引入明暗和颜色的不同，以及材质的不同</p>
 <h2 id="Blinn-Phong-Reflectance-Model-反射模型"><a href="#Blinn-Phong-Reflectance-Model-反射模型" class="headerlink" title="Blinn-Phong Reflectance Model 反射模型"></a>Blinn-Phong Reflectance Model 反射模型</h2><p>反射分为三个部分：</p>
 <ul>
 <li>高光</li>
@@ -316,32 +293,32 @@
 </ul>
 <p>需要归一化成单位向量</p>
 <p><img src="/images/Lecture07-09/20.png" alt="avatar"></p>
-<h3 id="Graphics-Real-time-Rendering-Pipeline-图形管线（实时渲染管线）"><a href="#Graphics-Real-time-Rendering-Pipeline-图形管线（实时渲染管线）" class="headerlink" title="Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）"></a>Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）</h3><p><img src="/images/Lecture07-09/21.png" alt="avatar"></p>
+<h2 id="Graphics-Real-time-Rendering-Pipeline-图形管线（实时渲染管线）"><a href="#Graphics-Real-time-Rendering-Pipeline-图形管线（实时渲染管线）" class="headerlink" title="Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）"></a>Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）</h2><p><img src="/images/Lecture07-09/21.png" alt="avatar"></p>
 <p><img src="/images/Lecture07-09/22.png" alt="avatar"></p>
 <p><img src="/images/Lecture07-09/23.png" alt="avatar"></p>
 <p><img src="/images/Lecture07-09/24.png" alt="avatar"></p>
 <p><img src="/images/Lecture07-09/25.png" alt="avatar"></p>
 <p><img src="/images/Lecture07-09/26.png" alt="avatar"></p>
-<h3 id="Texture-Mapping-纹理映射"><a href="#Texture-Mapping-纹理映射" class="headerlink" title="Texture Mapping 纹理映射"></a>Texture Mapping 纹理映射</h3><p>内部填充图，定义任意点的不同属性</p>
+<h2 id="Texture-Mapping-纹理映射"><a href="#Texture-Mapping-纹理映射" class="headerlink" title="Texture Mapping 纹理映射"></a>Texture Mapping 纹理映射</h2><p>内部填充图，定义任意点的不同属性</p>
 <p>任意三维物体的表面是二维的</p>
 <p>纹理就是一张图，放到物体表面即映射</p>
 <p><img src="/images/Lecture07-09/27.png" alt="avatar"></p>
 <p>三角形上的任意一个顶点都规定了纹理上的坐标</p>
-<h4 id="uv坐标"><a href="#uv坐标" class="headerlink" title="uv坐标"></a>uv坐标</h4><p><img src="/images/Lecture07-09/28.png" alt="avatar"></p>
+<h3 id="uv坐标"><a href="#uv坐标" class="headerlink" title="uv坐标"></a>uv坐标</h3><p><img src="/images/Lecture07-09/28.png" alt="avatar"></p>
 <p>三角形的三个顶点，每一个顶点对应一个uv</p>
 <p>Tileable textures 可无缝衔接纹理</p>
-<h3 id="重心坐标-Barycentric-Coordinates"><a href="#重心坐标-Barycentric-Coordinates" class="headerlink" title="重心坐标 Barycentric Coordinates"></a>重心坐标 Barycentric Coordinates</h3><p>对于平面上的三角形内的任意一点：</p>
+<h2 id="重心坐标-Barycentric-Coordinates"><a href="#重心坐标-Barycentric-Coordinates" class="headerlink" title="重心坐标 Barycentric Coordinates"></a>重心坐标 Barycentric Coordinates</h2><p>对于平面上的三角形内的任意一点：</p>
 <script type="math/tex; mode=display">
 (x,y)=\alpha A+\beta B+\gamma C \\
 \alpha+\beta+\gamma=1</script><p>其中$\alpha、\beta、\gamma$均为非负数</p>
-<h3 id="Applying-Textures-应用纹理"><a href="#Applying-Textures-应用纹理" class="headerlink" title="Applying Textures 应用纹理"></a>Applying Textures 应用纹理</h3><ol>
+<h2 id="Applying-Textures-应用纹理"><a href="#Applying-Textures-应用纹理" class="headerlink" title="Applying Textures 应用纹理"></a>Applying Textures 应用纹理</h2><ol>
 <li>找像素中心</li>
 <li>找纹理坐标uv</li>
 <li>求出纹理坐标上的值是多少</li>
 <li>将像素的值设为纹理坐标上的值texcolor</li>
 </ol>
-<h3 id="Texture-Magnification-纹理放大-如果纹理太小"><a href="#Texture-Magnification-纹理放大-如果纹理太小" class="headerlink" title="Texture Magnification 纹理放大 如果纹理太小"></a>Texture Magnification 纹理放大 如果纹理太小</h3><p>纹理太小，分辨率太大，任意一个点查询纹理会查到非整数的值。此处研究非整数的值应该怎么处理。</p>
-<h4 id="Nearest-四舍五入（就近）"><a href="#Nearest-四舍五入（就近）" class="headerlink" title="Nearest 四舍五入（就近）"></a>Nearest 四舍五入（就近）</h4><h4 id="Bilinear-Interpolation-双线性插值"><a href="#Bilinear-Interpolation-双线性插值" class="headerlink" title="Bilinear Interpolation 双线性插值"></a>Bilinear Interpolation 双线性插值</h4><p>找最近的四个点</p>
+<h2 id="Texture-Magnification-纹理放大-如果纹理太小"><a href="#Texture-Magnification-纹理放大-如果纹理太小" class="headerlink" title="Texture Magnification 纹理放大 如果纹理太小"></a>Texture Magnification 纹理放大 如果纹理太小</h2><p>纹理太小，分辨率太大，任意一个点查询纹理会查到非整数的值。此处研究非整数的值应该怎么处理。</p>
+<h3 id="Nearest-四舍五入（就近）"><a href="#Nearest-四舍五入（就近）" class="headerlink" title="Nearest 四舍五入（就近）"></a>Nearest 四舍五入（就近）</h3><h3 id="Bilinear-Interpolation-双线性插值"><a href="#Bilinear-Interpolation-双线性插值" class="headerlink" title="Bilinear Interpolation 双线性插值"></a>Bilinear Interpolation 双线性插值</h3><p>找最近的四个点</p>
 <p>一维线性插值公式：</p>
 <script type="math/tex; mode=display">
 lerp(x,v_0,v_1)=v_0+x(v_1-v_0)</script><p>先通过插值算水平方向上下两黑点的值</p>
@@ -351,9 +328,9 @@ u_1=lerp(s,u_{01},u_{11})</script><p>再通过插值计算竖直方向上刚刚�
 <script type="math/tex; mode=display">
 f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="avatar"></p>
 <p>双线性插值相比一些更高质量的方法略有逊色</p>
-<h4 id="Bicubic-双向三次插值"><a href="#Bicubic-双向三次插值" class="headerlink" title="Bicubic 双向三次插值"></a>Bicubic 双向三次插值</h4><p>取周围邻近16个点</p>
+<h3 id="Bicubic-双向三次插值"><a href="#Bicubic-双向三次插值" class="headerlink" title="Bicubic 双向三次插值"></a>Bicubic 双向三次插值</h3><p>取周围邻近16个点</p>
 <p>运算量更大，但结果更好</p>
-<h3 id="Texture-Magnification-如果纹理太大"><a href="#Texture-Magnification-如果纹理太大" class="headerlink" title="Texture Magnification 如果纹理太大"></a>Texture Magnification 如果纹理太大</h3><p>纹理太大问题更严重</p>
+<h2 id="Texture-Magnification-如果纹理太大"><a href="#Texture-Magnification-如果纹理太大" class="headerlink" title="Texture Magnification 如果纹理太大"></a>Texture Magnification 如果纹理太大</h2><p>纹理太大问题更严重</p>
 <p>如果按照普通的步骤将纹理的值写回像素，会遇到摩尔纹、锯齿等走样问题</p>
 <p>近处像素覆盖的纹理区域小，远处像素覆盖纹理区域大，因此远处如果认为一个像素的值为纹理的平均值，会走样（Lec9 PPT P30 结合图片理解）</p>
 <p>超采样可以解决，但代价太大</p>
@@ -363,27 +340,27 @@ f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="av
 <li>更高的采样率可以解决问题</li>
 </ul>
 <p>另一个思路：不采样，立刻知道区域中平均值</p>
-<h3 id="Mipmap"><a href="#Mipmap" class="headerlink" title="Mipmap"></a>Mipmap</h3><p>快、近似的、正方形的范围查询</p>
+<h2 id="Mipmap"><a href="#Mipmap" class="headerlink" title="Mipmap"></a>Mipmap</h2><p>快、近似的、正方形的范围查询</p>
 <p><img src="/images/Lecture07-09/30.png" alt="avatar"></p>
 <p>如上图<strong>存储</strong>很多层的mipmap</p>
 <p>从原始图像直到变成一个像素</p>
 <p>依次堆叠如同金字塔，因此在计算机视觉中被称为image pyramid</p>
 <p>仅占用额外的1/3存储</p>
-<h4 id="如何计算当前像素在第几层？"><a href="#如何计算当前像素在第几层？" class="headerlink" title="如何计算当前像素在第几层？"></a>如何计算当前像素在第几层？</h4><p>将屏幕上一个像素映射到纹理坐标上，计算这个像素在纹理坐标上的边长</p>
+<h3 id="如何计算当前像素在第几层？"><a href="#如何计算当前像素在第几层？" class="headerlink" title="如何计算当前像素在第几层？"></a>如何计算当前像素在第几层？</h3><p>将屏幕上一个像素映射到纹理坐标上，计算这个像素在纹理坐标上的边长</p>
 <p>此处边长L是如下图近似获得的</p>
 <p>设层数为D，纹理坐标上边长为L，LxL的正方形一定会在D层对应到一个像素大小</p>
 <p><img src="/images/Lecture07-09/31.png" alt="avatar"></p>
 <p>放到屏幕上，离得近则要在mipmap很低层查询，显示出的细节较多；离得远则在高层查询</p>
-<h4 id="如果要查询非整数层怎么做？三线性插值-Trilinear-Interprolation"><a href="#如果要查询非整数层怎么做？三线性插值-Trilinear-Interprolation" class="headerlink" title="如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation"></a>如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation</h4><p>先在层内双线性插值，再在层间插值</p>
+<h3 id="如果要查询非整数层怎么做？三线性插值-Trilinear-Interprolation"><a href="#如果要查询非整数层怎么做？三线性插值-Trilinear-Interprolation" class="headerlink" title="如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation"></a>如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation</h3><p>先在层内双线性插值，再在层间插值</p>
 <p>据此，不同的区域可以获得连续变化的结果</p>
-<h4 id="Overblur-过分模糊"><a href="#Overblur-过分模糊" class="headerlink" title="Overblur 过分模糊"></a>Overblur 过分模糊</h4><h3 id="Anisotropic-Filtering-各向异性过滤"><a href="#Anisotropic-Filtering-各向异性过滤" class="headerlink" title="Anisotropic Filtering 各向异性过滤"></a>Anisotropic Filtering 各向异性过滤</h3><p>Ripmap</p>
+<h3 id="Overblur-过分模糊"><a href="#Overblur-过分模糊" class="headerlink" title="Overblur 过分模糊"></a>Overblur 过分模糊</h3><h2 id="Anisotropic-Filtering-各向异性过滤"><a href="#Anisotropic-Filtering-各向异性过滤" class="headerlink" title="Anisotropic Filtering 各向异性过滤"></a>Anisotropic Filtering 各向异性过滤</h2><p>Ripmap</p>
 <p>可以解决矩形区域问题，解决不了斜着的区域问题</p>
 <p>mipmap计算的图片长宽比不变（对角线上的图），各向异性过滤会计算不均匀的水平和竖直方向压缩</p>
 <p><img src="/images/Lecture07-09/32.png" alt="avatar"></p>
 <p>屏幕上一个像素映射到纹理上不一定是正方形，所以会造成overblur</p>
 <p>如果使用各向异性过滤，则遇到长条矩形区域依然可以进行范围查询</p>
 <p>各向异性过滤开销是mipmap的三倍</p>
-<h4 id="EWA-filtering"><a href="#EWA-filtering" class="headerlink" title="EWA filtering"></a>EWA filtering</h4>
+<h3 id="EWA-filtering"><a href="#EWA-filtering" class="headerlink" title="EWA filtering"></a>EWA filtering</h3>
     </div>
 
     
@@ -392,7 +369,8 @@ f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="av
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6-GAMES101/" rel="tag"># 图形学 GAMES101</a>
+              <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" rel="tag"># 图形学</a>
+              <a href="/tags/GAMES101/" rel="tag"># GAMES101</a>
           </div>
 
         
@@ -404,7 +382,10 @@ f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="av
     <a href="/2020/12/14/Lecture05-06/" rel="prev" title="Lecture 05-06 Rasterization 光栅化">
       <i class="fa fa-chevron-left"></i> Lecture 05-06 Rasterization 光栅化
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/22/Lecture10-12/" rel="next" title="Lecture10-12">
+      Lecture10-12 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -463,7 +444,7 @@ f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="av
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Visibility-Occlusion-%E5%8F%AF%E8%A7%81-%E4%B8%8D%E5%8F%AF%E8%A7%81%EF%BC%88%E5%85%89%E6%A0%85%E5%8C%96%E4%B8%AD%E7%9A%84%E5%86%85%E5%AE%B9%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">Visibility &#x2F; Occlusion 可见&#x2F;不可见（光栅化中的内容）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Z-Buffer-%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%86%B2"><span class="nav-number">1.1.</span> <span class="nav-text">Z-Buffer 深度缓冲</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Z-Buffer-%E4%BE%8B%E5%AD%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">Z-Buffer 例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Z-Buffer-%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.2.</span> <span class="nav-text">Z-Buffer 算法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shading-%E7%9D%80%E8%89%B2"><span class="nav-number">2.</span> <span class="nav-text">Shading 着色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Blinn-Phong-Reflectance-Model-%E5%8F%8D%E5%B0%84%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">Blinn-Phong Reflectance Model 反射模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Diffuse-Reflection-%E6%BC%AB%E5%8F%8D%E5%B0%84"><span class="nav-number">2.1.1.</span> <span class="nav-text">Diffuse Reflection 漫反射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Specular-Term-%E9%AB%98%E5%85%89"><span class="nav-number">2.1.2.</span> <span class="nav-text">Specular Term 高光</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ambient-Term-%E7%8E%AF%E5%A2%83%E5%85%89%E7%85%A7"><span class="nav-number">2.1.3.</span> <span class="nav-text">Ambient Term 环境光照</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blinn-Phong-Reflection-Model-%E5%8F%8D%E5%B0%84%E6%A8%A1%E5%9E%8B%E5%85%AC%E5%BC%8F"><span class="nav-number">2.1.4.</span> <span class="nav-text">Blinn-Phong Reflection Model 反射模型公式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shading-Frequencies-%E7%9D%80%E8%89%B2%E9%A2%91%E7%8E%87"><span class="nav-number">2.2.</span> <span class="nav-text">Shading Frequencies 着色频率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-triangle-flat-shading-%E9%80%90%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9D%80%E8%89%B2"><span class="nav-number">2.2.1.</span> <span class="nav-text">Shade each triangle (flat shading) 逐三角形着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-vertex-Gouraud-shading-%E9%80%90%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2"><span class="nav-number">2.2.2.</span> <span class="nav-text">Shade each vertex (Gouraud shading) 逐顶点着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-pixel-Phong-shading-%E9%80%90%E5%83%8F%E7%B4%A0%E7%9D%80%E8%89%B2"><span class="nav-number">2.2.3.</span> <span class="nav-text">Shade each pixel (Phong shading) 逐像素着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Graphics-Real-time-Rendering-Pipeline-%E5%9B%BE%E5%BD%A2%E7%AE%A1%E7%BA%BF%EF%BC%88%E5%AE%9E%E6%97%B6%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%EF%BC%89"><span class="nav-number">2.2.4.</span> <span class="nav-text">Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Texture-Mapping-%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84"><span class="nav-number">2.2.5.</span> <span class="nav-text">Texture Mapping 纹理映射</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#uv%E5%9D%90%E6%A0%87"><span class="nav-number">2.2.5.1.</span> <span class="nav-text">uv坐标</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%BF%83%E5%9D%90%E6%A0%87-Barycentric-Coordinates"><span class="nav-number">2.2.6.</span> <span class="nav-text">重心坐标 Barycentric Coordinates</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Applying-Textures-%E5%BA%94%E7%94%A8%E7%BA%B9%E7%90%86"><span class="nav-number">2.2.7.</span> <span class="nav-text">Applying Textures 应用纹理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Texture-Magnification-%E7%BA%B9%E7%90%86%E6%94%BE%E5%A4%A7-%E5%A6%82%E6%9E%9C%E7%BA%B9%E7%90%86%E5%A4%AA%E5%B0%8F"><span class="nav-number">2.2.8.</span> <span class="nav-text">Texture Magnification 纹理放大 如果纹理太小</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nearest-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%EF%BC%88%E5%B0%B1%E8%BF%91%EF%BC%89"><span class="nav-number">2.2.8.1.</span> <span class="nav-text">Nearest 四舍五入（就近）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bilinear-Interpolation-%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC"><span class="nav-number">2.2.8.2.</span> <span class="nav-text">Bilinear Interpolation 双线性插值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bicubic-%E5%8F%8C%E5%90%91%E4%B8%89%E6%AC%A1%E6%8F%92%E5%80%BC"><span class="nav-number">2.2.8.3.</span> <span class="nav-text">Bicubic 双向三次插值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Texture-Magnification-%E5%A6%82%E6%9E%9C%E7%BA%B9%E7%90%86%E5%A4%AA%E5%A4%A7"><span class="nav-number">2.2.9.</span> <span class="nav-text">Texture Magnification 如果纹理太大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mipmap"><span class="nav-number">2.2.10.</span> <span class="nav-text">Mipmap</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%E5%BD%93%E5%89%8D%E5%83%8F%E7%B4%A0%E5%9C%A8%E7%AC%AC%E5%87%A0%E5%B1%82%EF%BC%9F"><span class="nav-number">2.2.10.1.</span> <span class="nav-text">如何计算当前像素在第几层？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E8%A6%81%E6%9F%A5%E8%AF%A2%E9%9D%9E%E6%95%B4%E6%95%B0%E5%B1%82%E6%80%8E%E4%B9%88%E5%81%9A%EF%BC%9F%E4%B8%89%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC-Trilinear-Interprolation"><span class="nav-number">2.2.10.2.</span> <span class="nav-text">如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Overblur-%E8%BF%87%E5%88%86%E6%A8%A1%E7%B3%8A"><span class="nav-number">2.2.10.3.</span> <span class="nav-text">Overblur 过分模糊</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Anisotropic-Filtering-%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4"><span class="nav-number">2.2.11.</span> <span class="nav-text">Anisotropic Filtering 各向异性过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#EWA-filtering"><span class="nav-number">2.2.11.1.</span> <span class="nav-text">EWA filtering</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Shading-%E7%9D%80%E8%89%B2"><span class="nav-number">1.</span> <span class="nav-text">Shading 着色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Blinn-Phong-Reflectance-Model-%E5%8F%8D%E5%B0%84%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">Blinn-Phong Reflectance Model 反射模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Diffuse-Reflection-%E6%BC%AB%E5%8F%8D%E5%B0%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">Diffuse Reflection 漫反射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Specular-Term-%E9%AB%98%E5%85%89"><span class="nav-number">1.1.2.</span> <span class="nav-text">Specular Term 高光</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ambient-Term-%E7%8E%AF%E5%A2%83%E5%85%89%E7%85%A7"><span class="nav-number">1.1.3.</span> <span class="nav-text">Ambient Term 环境光照</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blinn-Phong-Reflection-Model-%E5%8F%8D%E5%B0%84%E6%A8%A1%E5%9E%8B%E5%85%AC%E5%BC%8F"><span class="nav-number">1.1.4.</span> <span class="nav-text">Blinn-Phong Reflection Model 反射模型公式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shading-Frequencies-%E7%9D%80%E8%89%B2%E9%A2%91%E7%8E%87"><span class="nav-number">1.2.</span> <span class="nav-text">Shading Frequencies 着色频率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-triangle-flat-shading-%E9%80%90%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9D%80%E8%89%B2"><span class="nav-number">1.2.1.</span> <span class="nav-text">Shade each triangle (flat shading) 逐三角形着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-vertex-Gouraud-shading-%E9%80%90%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2"><span class="nav-number">1.2.2.</span> <span class="nav-text">Shade each vertex (Gouraud shading) 逐顶点着色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shade-each-pixel-Phong-shading-%E9%80%90%E5%83%8F%E7%B4%A0%E7%9D%80%E8%89%B2"><span class="nav-number">1.2.3.</span> <span class="nav-text">Shade each pixel (Phong shading) 逐像素着色</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Graphics-Real-time-Rendering-Pipeline-%E5%9B%BE%E5%BD%A2%E7%AE%A1%E7%BA%BF%EF%BC%88%E5%AE%9E%E6%97%B6%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">Graphics (Real-time Rendering) Pipeline 图形管线（实时渲染管线）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Texture-Mapping-%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84"><span class="nav-number">1.4.</span> <span class="nav-text">Texture Mapping 纹理映射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#uv%E5%9D%90%E6%A0%87"><span class="nav-number">1.4.1.</span> <span class="nav-text">uv坐标</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%BF%83%E5%9D%90%E6%A0%87-Barycentric-Coordinates"><span class="nav-number">1.5.</span> <span class="nav-text">重心坐标 Barycentric Coordinates</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Applying-Textures-%E5%BA%94%E7%94%A8%E7%BA%B9%E7%90%86"><span class="nav-number">1.6.</span> <span class="nav-text">Applying Textures 应用纹理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Texture-Magnification-%E7%BA%B9%E7%90%86%E6%94%BE%E5%A4%A7-%E5%A6%82%E6%9E%9C%E7%BA%B9%E7%90%86%E5%A4%AA%E5%B0%8F"><span class="nav-number">1.7.</span> <span class="nav-text">Texture Magnification 纹理放大 如果纹理太小</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nearest-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5%EF%BC%88%E5%B0%B1%E8%BF%91%EF%BC%89"><span class="nav-number">1.7.1.</span> <span class="nav-text">Nearest 四舍五入（就近）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bilinear-Interpolation-%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC"><span class="nav-number">1.7.2.</span> <span class="nav-text">Bilinear Interpolation 双线性插值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bicubic-%E5%8F%8C%E5%90%91%E4%B8%89%E6%AC%A1%E6%8F%92%E5%80%BC"><span class="nav-number">1.7.3.</span> <span class="nav-text">Bicubic 双向三次插值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Texture-Magnification-%E5%A6%82%E6%9E%9C%E7%BA%B9%E7%90%86%E5%A4%AA%E5%A4%A7"><span class="nav-number">1.8.</span> <span class="nav-text">Texture Magnification 如果纹理太大</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mipmap"><span class="nav-number">1.9.</span> <span class="nav-text">Mipmap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%E5%BD%93%E5%89%8D%E5%83%8F%E7%B4%A0%E5%9C%A8%E7%AC%AC%E5%87%A0%E5%B1%82%EF%BC%9F"><span class="nav-number">1.9.1.</span> <span class="nav-text">如何计算当前像素在第几层？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E8%A6%81%E6%9F%A5%E8%AF%A2%E9%9D%9E%E6%95%B4%E6%95%B0%E5%B1%82%E6%80%8E%E4%B9%88%E5%81%9A%EF%BC%9F%E4%B8%89%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC-Trilinear-Interprolation"><span class="nav-number">1.9.2.</span> <span class="nav-text">如果要查询非整数层怎么做？三线性插值 Trilinear Interprolation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Overblur-%E8%BF%87%E5%88%86%E6%A8%A1%E7%B3%8A"><span class="nav-number">1.9.3.</span> <span class="nav-text">Overblur 过分模糊</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Anisotropic-Filtering-%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4"><span class="nav-number">1.10.</span> <span class="nav-text">Anisotropic Filtering 各向异性过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EWA-filtering"><span class="nav-number">1.10.1.</span> <span class="nav-text">EWA filtering</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -477,12 +458,12 @@ f(x,y)=lerp(t,u_0,u_1)</script><p><img src="/images/Lecture07-09/29.png" alt="av
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
