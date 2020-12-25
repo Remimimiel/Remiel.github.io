@@ -20,19 +20,38 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="介绍几何">
+  <meta name="description" content="几何的隐式表示：CSG、距离函数，显式表示，贝塞尔曲线">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Lecture10-12 Geometry 几何">
 <meta property="og:url" content="http://example.com/2020/12/22/Lecture10-12/index.html">
 <meta property="og:site_name" content="Remiel">
-<meta property="og:description" content="介绍几何">
+<meta property="og:description" content="几何的隐式表示：CSG、距离函数，显式表示，贝塞尔曲线">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/01.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/02.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/03.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/04.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/05.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/06.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/07.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/08.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/09.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/10.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/11.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/12.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/13.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/14.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/15.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/16.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/17.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/18.png">
 <meta property="article:published_time" content="2020-12-22T07:39:14.000Z">
-<meta property="article:modified_time" content="2020-12-22T14:41:57.246Z">
+<meta property="article:modified_time" content="2020-12-25T15:16:24.352Z">
 <meta property="article:author" content="Remiel">
 <meta property="article:tag" content="图形学">
 <meta property="article:tag" content="GAMES101">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/Lecture10-12/01.png">
 
 <link rel="canonical" href="http://example.com/2020/12/22/Lecture10-12/">
 
@@ -174,13 +193,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-12-22 15:39:14 / 修改时间：22:41:57" itemprop="dateCreated datePublished" datetime="2020-12-22T15:39:14+08:00">2020-12-22</time>
+              <time title="创建时间：2020-12-22 15:39:14" itemprop="dateCreated datePublished" datetime="2020-12-22T15:39:14+08:00">2020-12-22</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-25 23:16:24" itemprop="dateModified" datetime="2020-12-25T23:16:24+08:00">2020-12-25</time>
+              </span>
 
           
-            <div class="post-description">介绍几何</div>
+            <div class="post-description">几何的隐式表示：CSG、距离函数，显式表示，贝塞尔曲线</div>
 
         </div>
       </header>
@@ -191,7 +216,91 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h1 id="几何的表示方法：Implicit-Explicit"><a href="#几何的表示方法：Implicit-Explicit" class="headerlink" title="几何的表示方法：Implicit/Explicit"></a>几何的表示方法：Implicit/Explicit</h1><p><img src="/images/Lecture10-12/01.png" alt="avatar"></p>
+<h2 id="Implicit-Geometry-隐式"><a href="#Implicit-Geometry-隐式" class="headerlink" title="Implicit Geometry 隐式"></a>Implicit Geometry 隐式</h2><p>“隐式”指将点归类，满足某个特定关系的点</p>
+<p>E.g. 单位球 $x^2+y^2+z^2=1$</p>
+<p>更通用情况: $f(x,y,z)=0$</p>
+<p>圆环：$f(x,y,z)=（2-\sqrt{x^2+y^2})^2+z^2-1$</p>
+<p>通过函数判断形状很难，但容易判断点在物体内或外</p>
+<h3 id="常见的隐式表示方法"><a href="#常见的隐式表示方法" class="headerlink" title="常见的隐式表示方法"></a>常见的隐式表示方法</h3><p>参考ppt</p>
+<h2 id="Explicit-Geometry-显式"><a href="#Explicit-Geometry-显式" class="headerlink" title="Explicit Geometry 显式"></a>Explicit Geometry 显式</h2><p>所有点都直接给出，或通过参数映射（parameter mapping）</p>
+<p>比如 $f:\mathbb{R}^2\rightarrow\mathbb{R}^3; (u,v)\mapsto(x,y,z)$</p>
+<p>如 $f(u,v)=((2+cosu)cosv,(2+cosu)sinv,sinu)$</p>
+<p>依然是圆环</p>
+<p>难以判断形状，也难以判断点的位置</p>
+<h1 id="隐式表示方法"><a href="#隐式表示方法" class="headerlink" title="隐式表示方法"></a>隐式表示方法</h1><h2 id="Constructive-Solid-Geometry-Implicit-CSG"><a href="#Constructive-Solid-Geometry-Implicit-CSG" class="headerlink" title="Constructive Solid Geometry (Implicit) /CSG"></a>Constructive Solid Geometry (Implicit) /CSG</h2><p>几何的隐式表示不一定要通过代数方法（函数）来描述</p>
+<p>可以通过一系列基本几何的布尔运算定义复杂的几何</p>
+<p><img src="/images/Lecture10-12/02.png" alt="avatar"></p>
+<h2 id="Distance-Functions-Implicit-距离函数"><a href="#Distance-Functions-Implicit-距离函数" class="headerlink" title="Distance Functions (Implicit) 距离函数"></a>Distance Functions (Implicit) 距离函数</h2><p>对于任何几何，不直接描述它的表面，而是描述任何一个点到这个表面的最近距离</p>
+<p>距离函数：空间中的任何一个点到物体上的点的最小距离</p>
+<p>注意：距离函数是针对单一物体而言的，距离可以为正也可以为负（在物体内）</p>
+<p>对于某两个需要融合（blend）的物体，分别求出它们各自的距离函数，将距离函数融合（blend），再恢复成原本的面</p>
+<p>所谓恢复，即SDF（Signed Distance Fields）为0</p>
+<p>以下例子，下面三张图为使用了距离函数后的图示，阴影部分为物体，左边在物体内部，右边在物体外部，红线表示空间中的点，靠近物体的点距离函数值较小，A、B通过距离函数融合（blend）得到第三张图</p>
+<p><img src="/images/Lecture10-12/03.png" alt="avatar"></p>
+<h2 id="Level-Set-Methods-Also-implicit-水平集"><a href="#Level-Set-Methods-Also-implicit-水平集" class="headerlink" title="Level Set Methods (Also implicit) 水平集"></a>Level Set Methods (Also implicit) 水平集</h2><p>如果距离函数不好表示为式子，则可以表示为水平集</p>
+<p>写在格子上的函数值</p>
+<p>函数在什么地方应该等于0</p>
+<p>类似等高线</p>
+<p><img src="/images/Lecture10-12/04.png" alt="avatar"></p>
+<h2 id="Fractals-Implicit-分形-自相似"><a href="#Fractals-Implicit-分形-自相似" class="headerlink" title="Fractals (Implicit) 分形/自相似"></a>Fractals (Implicit) 分形/自相似</h2><p>类似递归</p>
+<p><img src="/images/Lecture10-12/05.png" alt="avatar"></p>
+<h1 id="显式表示方法"><a href="#显式表示方法" class="headerlink" title="显式表示方法"></a>显式表示方法</h1><h2 id="Point-Cloud-Explicit-点云"><a href="#Point-Cloud-Explicit-点云" class="headerlink" title="Point Cloud (Explicit) 点云"></a>Point Cloud (Explicit) 点云</h2><p>不考虑物体为表面，考虑物体表面上的点，将每个点都表示出来，只要点表示的足够细则能表示曲面</p>
+<p>扫描后的原始数据一般是点云</p>
+<p>如何将点云变为三角形面？</p>
+<p><img src="/images/Lecture10-12/06.png" alt="avatar"></p>
+<h2 id="Polygon-Mesh-Explicit-多边形面"><a href="#Polygon-Mesh-Explicit-多边形面" class="headerlink" title="Polygon Mesh (Explicit) 多边形面"></a>Polygon Mesh (Explicit) 多边形面</h2><p>将面拆成小的三角形</p>
+<p><img src="/images/Lecture10-12/07.png" alt="avatar"></p>
+<h2 id="The-Wavefront-Object-File-obj-Format"><a href="#The-Wavefront-Object-File-obj-Format" class="headerlink" title="The Wavefront Object File (.obj) Format"></a>The Wavefront Object File (.obj) Format</h2><p>$\uparrow$图形学中如何用三角形面表示形成的物体</p>
+<p>将点、法线和纹理坐标分开表示，最后组织起来形成模型</p>
+<p>v为点，vn为法线，vt为纹理坐标</p>
+<p>f为连接关系，即哪三个点会形成一个三角形，数字为 [顶点/纹理坐标/法线] 的序号</p>
+<p><img src="/images/Lecture10-12/08.png" alt="avatar"></p>
+<h1 id="Curves-曲线"><a href="#Curves-曲线" class="headerlink" title="Curves 曲线"></a>Curves 曲线</h1><h2 id="Bézier-Curves-贝塞尔曲线"><a href="#Bézier-Curves-贝塞尔曲线" class="headerlink" title="Bézier Curves 贝塞尔曲线"></a>Bézier Curves 贝塞尔曲线</h2><p>用一系列控制点定义某个曲线</p>
+<p>从P0开始沿着P0到P1方向，最后在P3结束并且方向为P2到P3方向</p>
+<p><img src="/images/Lecture10-12/09.png" alt="avatar"></p>
+<h3 id="de-Casteljau-Algorithm"><a href="#de-Casteljau-Algorithm" class="headerlink" title="de Casteljau Algorithm"></a>de Casteljau Algorithm</h3><p>给定一系列控制点，如何画出一条贝塞尔曲线？</p>
+<p>例1: 三个点，生成二次贝塞尔曲线</p>
+<p><img src="/images/Lecture10-12/10.png" alt="avatar"></p>
+<p>假设曲线起点在时间0，终点在时间1，即找出在任意时间t，曲线的点对应空间中的位置</p>
+<p><img src="/images/Lecture10-12/11.png" alt="avatar"></p>
+<p>每条线段上都找出比例大致为t的点</p>
+<p><img src="/images/Lecture10-12/12.png" alt="avatar"></p>
+<p>将两个点连接，在新形成的线段上找出t点，这个点即这条贝塞尔曲线在时间t时所在的位置</p>
+<p><img src="/images/Lecture10-12/13.png" alt="avatar"></p>
+<p>通过参数t来定义，所以贝塞尔曲线是显式表示</p>
+<p>其他点通过同样的方式找出</p>
+<p><img src="/images/Lecture10-12/14.png" alt="avatar"></p>
+<p>例2: 给定四个点，生成贝塞尔曲线</p>
+<p><img src="/images/Lecture10-12/15.png" alt="avatar"></p>
+<h3 id="贝塞尔曲线的代数表示方法"><a href="#贝塞尔曲线的代数表示方法" class="headerlink" title="贝塞尔曲线的代数表示方法"></a>贝塞尔曲线的代数表示方法</h3><p>表示出控制点和时间t的关系</p>
+<p><img src="/images/Lecture10-12/16.png" alt="avatar"></p>
+<p>类似线性插值</p>
+<p>任意时刻，贝塞尔曲线上的点是控制点的组合</p>
+<p><img src="/images/Lecture10-12/17.png" alt="avatar"></p>
+<p>系数相当于 $[(1-t)+t]^n$ 完全平方，其中n为控制点个数-1</p>
+<p>给出 $n+1$ 个控制点，可以得到 $n$ 阶贝塞尔曲线</p>
+<script type="math/tex; mode=display">
+\mathbf{b}^n(t)=\mathbf{b}_0^n(t)=\sum_{j=0}^n\mathbf{b}_jB^n_j(t)</script><p>其中 $B^n_i(t)$ 是伯恩施坦多项式（Bernstein polynomial）</p>
+<script type="math/tex; mode=display">
+B^n_i(t)=\begin{pmatrix}n\\i\end{pmatrix}t^i(1-t)^{n-i}</script><p>其中</p>
+<script type="math/tex; mode=display">
+\begin{pmatrix}n\\i\end{pmatrix}=\frac{n!}{i!(n-i)!}</script><p>相当于 $C_n^i$</p>
+<h3 id="贝塞尔曲线的性质"><a href="#贝塞尔曲线的性质" class="headerlink" title="贝塞尔曲线的性质"></a>贝塞尔曲线的性质</h3><ul>
+<li><p>固定的起点和终点</p>
+</li>
+<li><p>对于Cubic case三次贝塞尔曲线（四个控制点），$\mathbf{b}’(0) = 3(\mathbf{b}_1-\mathbf{b}_0); \mathbf{b}’(1) = 3(\mathbf{b}_3-\mathbf{b}_2)$</p>
+</li>
+<li><p>通过原始控制点画出贝塞尔曲线，对曲线上的每个点做仿射变换，得到的贝塞尔曲线与原来一样</p>
+</li>
+<li><p>凸包性质：画出的贝塞尔曲线一定在控制点形成的凸包内</p>
+<ul>
+<li>凸包 (Convex Hull) ：能够包围一系列给定几何形体的最小的凸多边形</li>
+</ul>
+<p><img src="/images/Lecture10-12/18.png" alt="avatar"></p>
+</li>
+</ul>
+<h2 id="Piecewise-Bézier-Curves-逐段贝塞尔曲线"><a href="#Piecewise-Bézier-Curves-逐段贝塞尔曲线" class="headerlink" title="Piecewise Bézier Curves 逐段贝塞尔曲线"></a>Piecewise Bézier Curves 逐段贝塞尔曲线</h2>
     </div>
 
     
@@ -272,6 +381,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%EF%BC%9AImplicit-Explicit"><span class="nav-number">1.</span> <span class="nav-text">几何的表示方法：Implicit&#x2F;Explicit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Implicit-Geometry-%E9%9A%90%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">Implicit Geometry 隐式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9A%90%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">常见的隐式表示方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Explicit-Geometry-%E6%98%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">Explicit Geometry 显式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">隐式表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Constructive-Solid-Geometry-Implicit-CSG"><span class="nav-number">2.1.</span> <span class="nav-text">Constructive Solid Geometry (Implicit) &#x2F;CSG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Distance-Functions-Implicit-%E8%B7%9D%E7%A6%BB%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">Distance Functions (Implicit) 距离函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Level-Set-Methods-Also-implicit-%E6%B0%B4%E5%B9%B3%E9%9B%86"><span class="nav-number">2.3.</span> <span class="nav-text">Level Set Methods (Also implicit) 水平集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fractals-Implicit-%E5%88%86%E5%BD%A2-%E8%87%AA%E7%9B%B8%E4%BC%BC"><span class="nav-number">2.4.</span> <span class="nav-text">Fractals (Implicit) 分形&#x2F;自相似</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%BE%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">显式表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Point-Cloud-Explicit-%E7%82%B9%E4%BA%91"><span class="nav-number">3.1.</span> <span class="nav-text">Point Cloud (Explicit) 点云</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Polygon-Mesh-Explicit-%E5%A4%9A%E8%BE%B9%E5%BD%A2%E9%9D%A2"><span class="nav-number">3.2.</span> <span class="nav-text">Polygon Mesh (Explicit) 多边形面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The-Wavefront-Object-File-obj-Format"><span class="nav-number">3.3.</span> <span class="nav-text">The Wavefront Object File (.obj) Format</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Curves-%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">Curves 曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Be%CC%81zier-Curves-%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.1.</span> <span class="nav-text">Bézier Curves 贝塞尔曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#de-Casteljau-Algorithm"><span class="nav-number">4.1.1.</span> <span class="nav-text">de Casteljau Algorithm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E4%BB%A3%E6%95%B0%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">4.1.2.</span> <span class="nav-text">贝塞尔曲线的代数表示方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">4.1.3.</span> <span class="nav-text">贝塞尔曲线的性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Piecewise-Be%CC%81zier-Curves-%E9%80%90%E6%AE%B5%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.2.</span> <span class="nav-text">Piecewise Bézier Curves 逐段贝塞尔曲线</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
