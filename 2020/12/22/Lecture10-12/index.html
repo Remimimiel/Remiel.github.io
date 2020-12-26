@@ -53,8 +53,21 @@
 <meta property="og:image" content="http://example.com/images/Lecture10-12/24.png">
 <meta property="og:image" content="http://example.com/images/Lecture10-12/25.png">
 <meta property="og:image" content="http://example.com/images/Lecture10-12/26.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/27.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/28.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/29.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/30.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/31.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/32.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/33.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/34.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/35.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/36.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/37.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/38.png">
+<meta property="og:image" content="http://example.com/images/Lecture10-12/39.png">
 <meta property="article:published_time" content="2020-12-22T07:39:14.000Z">
-<meta property="article:modified_time" content="2020-12-26T12:07:53.003Z">
+<meta property="article:modified_time" content="2020-12-26T13:49:48.376Z">
 <meta property="article:author" content="Remiel">
 <meta property="article:tag" content="图形学">
 <meta property="article:tag" content="GAMES101">
@@ -209,7 +222,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-26 20:07:53" itemprop="dateModified" datetime="2020-12-26T20:07:53+08:00">2020-12-26</time>
+                <time title="修改时间：2020-12-26 21:49:48" itemprop="dateModified" datetime="2020-12-26T21:49:48+08:00">2020-12-26</time>
               </span>
 
           
@@ -341,12 +354,73 @@ B^n_i(t)=\begin{pmatrix}n\\i\end{pmatrix}t^i(1-t)^{n-i}</script><p>其中</p>
 <p>即可将参数uv映射到曲面上任何一个点</p>
 <p><img src="/images/Lecture10-12/25.png" alt="avatar"></p>
 <h2 id="Mesh-Operations-Geometry-Processing-网格"><a href="#Mesh-Operations-Geometry-Processing-网格" class="headerlink" title="Mesh Operations: Geometry Processing 网格"></a>Mesh Operations: Geometry Processing 网格</h2><p>几何处理</p>
-<ul>
-<li>Mesh subdivision 网格细分</li>
-<li>Mesh simplification 逆过程，保持基本形状的情况下用更小的三角形来保存</li>
-<li>Mesh regularization 正规化，让三角形基本保持相似</li>
-</ul>
 <p><img src="/images/Lecture10-12/26.png" alt="avatar"></p>
+<ul>
+<li><p>Mesh subdivision (upsampling) 网格细分</p>
+<p><img src="/images/Lecture10-12/27.png" alt="avatar"></p>
+</li>
+<li><p>Mesh simplification (downsampling) 逆过程，保持基本形状的情况下用更小的三角形来保存</p>
+<p><img src="/images/Lecture10-12/28.png" alt="avatar"></p>
+</li>
+<li><p>Mesh regularization (same #triangles) 正规化，让三角形基本保持相似</p>
+<p><img src="/images/Lecture10-12/29.png" alt="avatar"></p>
+</li>
+</ul>
+<h2 id="Subdivision-细分"><a href="#Subdivision-细分" class="headerlink" title="Subdivision 细分"></a>Subdivision 细分</h2><h3 id="Loop-Subdivision（发明者叫Loop）"><a href="#Loop-Subdivision（发明者叫Loop）" class="headerlink" title="Loop Subdivision（发明者叫Loop）"></a>Loop Subdivision（发明者叫Loop）</h3><p>先细分再调整</p>
+<ol>
+<li>分出更多的三角形<ul>
+<li>将三角形顶点区分开，区分成新的顶点和老的顶点</li>
+</ul>
+</li>
+<li>将三角形位置微调，使得原来的模型更光滑<ul>
+<li>对于新老两种顶点，分别改变它们的位置</li>
+</ul>
+</li>
+</ol>
+<p><img src="/images/Lecture10-12/30.png" alt="avatar"></p>
+<h4 id="更新算法"><a href="#更新算法" class="headerlink" title="更新算法"></a>更新算法</h4><p>对于新的顶点：</p>
+<p>设两三角形共享边的两顶点为AB，不共享两顶点为CD，将这四个点的位置进行如下的加权平均</p>
+<p>A+B表示A和B的平均位置，C+D同理</p>
+<p><img src="/images/Lecture10-12/31.png" alt="avatar"></p>
+<p>对于旧的顶点：</p>
+<p>六个三角形共用一个顶点</p>
+<p>n为顶点的度，即点连接边的数量</p>
+<p>u为与度有关系的一个数</p>
+<p>一方面白点要相信自己原本表示的位置 original_position，另一方面相信周围顶点的平均</p>
+<p><img src="/images/Lecture10-12/32.png" alt="avatar"></p>
+<h3 id="Catmull-Clark-Subdivision-General-Mesh"><a href="#Catmull-Clark-Subdivision-General-Mesh" class="headerlink" title="Catmull-Clark Subdivision (General Mesh)"></a>Catmull-Clark Subdivision (General Mesh)</h3><p>loop细分只能用在三角形网格上</p>
+<p>catmull-clark细分可以应用于一般的网格</p>
+<h4 id="细分："><a href="#细分：" class="headerlink" title="细分："></a>细分：</h4><p>quad face 四边形面</p>
+<p>non-quad face 非四边形面</p>
+<p>extraordinary vertex 奇异点：度不为4</p>
+<p>对于每一步细分：</p>
+<ol>
+<li>每一条边取中点</li>
+<li>每一个面取中间的一个点</li>
+<li>将边上的中点和面上的点连起来</li>
+</ol>
+<p><img src="/images/Lecture10-12/33.png" alt="avatar"></p>
+<p><img src="/images/Lecture10-12/34.png" alt="avatar"></p>
+<p>性质：</p>
+<ul>
+<li>引入新的奇异点，只要在非四边形内的点都会成为奇异点</li>
+<li>老的点度不变，新的点度数为多边形面数</li>
+<li>每个非四边形面都会引入奇异点，引入奇异点后非四边形面消失</li>
+<li>第一次细分时增加了 非四边形面数 个奇异点，之后不再增加</li>
+</ul>
+<p>之后继续细分可印证上述性质：</p>
+<p><img src="/images/Lecture10-12/35.png" alt="avatar"></p>
+<h4 id="更新："><a href="#更新：" class="headerlink" title="更新："></a>更新：</h4><p>Face point 面中心的点</p>
+<p>Edge point 边中心的点</p>
+<p>Vertex point 老的点</p>
+<p><img src="/images/Lecture10-12/36.png" alt="avatar"></p>
+<p>通过平均的方式使整个平面得到平滑</p>
+<p>loop细分和catmull-clerk细分对比：</p>
+<p><img src="/images/Lecture10-12/37.png" alt="avatar"></p>
+<h2 id="Mesh-Simplification"><a href="#Mesh-Simplification" class="headerlink" title="Mesh Simplification"></a>Mesh Simplification</h2><p>简化模型，加强性能表现</p>
+<p>以及远近变化时多边形面数的变化，几何的层次结构，类似mipmap</p>
+<p><img src="/images/Lecture10-12/38.png" alt="avatar"></p>
+<h3 id="Edge-Collapse-边坍缩"><a href="#Edge-Collapse-边坍缩" class="headerlink" title="Edge Collapse 边坍缩"></a>Edge Collapse 边坍缩</h3><p><img src="/images/Lecture10-12/39.png" alt="avatar"></p>
 
     </div>
 
@@ -428,7 +502,7 @@ B^n_i(t)=\begin{pmatrix}n\\i\end{pmatrix}t^i(1-t)^{n-i}</script><p>其中</p>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%EF%BC%9AImplicit-Explicit"><span class="nav-number">1.</span> <span class="nav-text">几何的表示方法：Implicit&#x2F;Explicit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Implicit-Geometry-%E9%9A%90%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">Implicit Geometry 隐式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9A%90%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">常见的隐式表示方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Explicit-Geometry-%E6%98%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">Explicit Geometry 显式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">隐式表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Constructive-Solid-Geometry-Implicit-CSG"><span class="nav-number">2.1.</span> <span class="nav-text">Constructive Solid Geometry (Implicit) &#x2F;CSG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Distance-Functions-Implicit-%E8%B7%9D%E7%A6%BB%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">Distance Functions (Implicit) 距离函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Level-Set-Methods-Also-implicit-%E6%B0%B4%E5%B9%B3%E9%9B%86"><span class="nav-number">2.3.</span> <span class="nav-text">Level Set Methods (Also implicit) 水平集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fractals-Implicit-%E5%88%86%E5%BD%A2-%E8%87%AA%E7%9B%B8%E4%BC%BC"><span class="nav-number">2.4.</span> <span class="nav-text">Fractals (Implicit) 分形&#x2F;自相似</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%BE%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">显式表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Point-Cloud-Explicit-%E7%82%B9%E4%BA%91"><span class="nav-number">3.1.</span> <span class="nav-text">Point Cloud (Explicit) 点云</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Polygon-Mesh-Explicit-%E5%A4%9A%E8%BE%B9%E5%BD%A2%E9%9D%A2"><span class="nav-number">3.2.</span> <span class="nav-text">Polygon Mesh (Explicit) 多边形面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The-Wavefront-Object-File-obj-Format"><span class="nav-number">3.3.</span> <span class="nav-text">The Wavefront Object File (.obj) Format</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Curves-%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">Curves 曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Be%CC%81zier-Curves-%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.1.</span> <span class="nav-text">Bézier Curves 贝塞尔曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#de-Casteljau-Algorithm"><span class="nav-number">4.1.1.</span> <span class="nav-text">de Casteljau Algorithm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E4%BB%A3%E6%95%B0%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">4.1.2.</span> <span class="nav-text">贝塞尔曲线的代数表示方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">4.1.3.</span> <span class="nav-text">贝塞尔曲线的性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Piecewise-Be%CC%81zier-Curves-%E9%80%90%E6%AE%B5%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.2.</span> <span class="nav-text">Piecewise Bézier Curves 逐段贝塞尔曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E7%BB%AD%E6%80%A7"><span class="nav-number">4.2.1.</span> <span class="nav-text">连续性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.3.</span> <span class="nav-text">其他曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spline-%E6%A0%B7%E6%9D%A1"><span class="nav-number">4.3.1.</span> <span class="nav-text">Spline 样条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-splines-B%E6%A0%B7%E6%9D%A1"><span class="nav-number">4.3.2.</span> <span class="nav-text">B-splines B样条</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Surfaces-%E6%9B%B2%E9%9D%A2"><span class="nav-number">5.</span> <span class="nav-text">Surfaces 曲面</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Be%CC%81zier-Surfaces-%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E9%9D%A2"><span class="nav-number">5.1.</span> <span class="nav-text">Bézier Surfaces 贝塞尔曲面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Evaluating-Be%CC%81zier-Surfaces-%E5%A6%82%E4%BD%95%E7%94%BB%E5%87%BA%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E9%9D%A2"><span class="nav-number">5.1.1.</span> <span class="nav-text">Evaluating Bézier Surfaces 如何画出贝塞尔曲面</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mesh-Operations-Geometry-Processing-%E7%BD%91%E6%A0%BC"><span class="nav-number">5.2.</span> <span class="nav-text">Mesh Operations: Geometry Processing 网格</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%EF%BC%9AImplicit-Explicit"><span class="nav-number">1.</span> <span class="nav-text">几何的表示方法：Implicit&#x2F;Explicit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Implicit-Geometry-%E9%9A%90%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">Implicit Geometry 隐式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9A%90%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">常见的隐式表示方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Explicit-Geometry-%E6%98%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">Explicit Geometry 显式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">隐式表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Constructive-Solid-Geometry-Implicit-CSG"><span class="nav-number">2.1.</span> <span class="nav-text">Constructive Solid Geometry (Implicit) &#x2F;CSG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Distance-Functions-Implicit-%E8%B7%9D%E7%A6%BB%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">Distance Functions (Implicit) 距离函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Level-Set-Methods-Also-implicit-%E6%B0%B4%E5%B9%B3%E9%9B%86"><span class="nav-number">2.3.</span> <span class="nav-text">Level Set Methods (Also implicit) 水平集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fractals-Implicit-%E5%88%86%E5%BD%A2-%E8%87%AA%E7%9B%B8%E4%BC%BC"><span class="nav-number">2.4.</span> <span class="nav-text">Fractals (Implicit) 分形&#x2F;自相似</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%BE%E5%BC%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">显式表示方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Point-Cloud-Explicit-%E7%82%B9%E4%BA%91"><span class="nav-number">3.1.</span> <span class="nav-text">Point Cloud (Explicit) 点云</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Polygon-Mesh-Explicit-%E5%A4%9A%E8%BE%B9%E5%BD%A2%E9%9D%A2"><span class="nav-number">3.2.</span> <span class="nav-text">Polygon Mesh (Explicit) 多边形面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The-Wavefront-Object-File-obj-Format"><span class="nav-number">3.3.</span> <span class="nav-text">The Wavefront Object File (.obj) Format</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Curves-%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.</span> <span class="nav-text">Curves 曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Be%CC%81zier-Curves-%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.1.</span> <span class="nav-text">Bézier Curves 贝塞尔曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#de-Casteljau-Algorithm"><span class="nav-number">4.1.1.</span> <span class="nav-text">de Casteljau Algorithm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E4%BB%A3%E6%95%B0%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="nav-number">4.1.2.</span> <span class="nav-text">贝塞尔曲线的代数表示方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">4.1.3.</span> <span class="nav-text">贝塞尔曲线的性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Piecewise-Be%CC%81zier-Curves-%E9%80%90%E6%AE%B5%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.2.</span> <span class="nav-text">Piecewise Bézier Curves 逐段贝塞尔曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E7%BB%AD%E6%80%A7"><span class="nav-number">4.2.1.</span> <span class="nav-text">连续性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%9B%B2%E7%BA%BF"><span class="nav-number">4.3.</span> <span class="nav-text">其他曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spline-%E6%A0%B7%E6%9D%A1"><span class="nav-number">4.3.1.</span> <span class="nav-text">Spline 样条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-splines-B%E6%A0%B7%E6%9D%A1"><span class="nav-number">4.3.2.</span> <span class="nav-text">B-splines B样条</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Surfaces-%E6%9B%B2%E9%9D%A2"><span class="nav-number">5.</span> <span class="nav-text">Surfaces 曲面</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Be%CC%81zier-Surfaces-%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E9%9D%A2"><span class="nav-number">5.1.</span> <span class="nav-text">Bézier Surfaces 贝塞尔曲面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Evaluating-Be%CC%81zier-Surfaces-%E5%A6%82%E4%BD%95%E7%94%BB%E5%87%BA%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E9%9D%A2"><span class="nav-number">5.1.1.</span> <span class="nav-text">Evaluating Bézier Surfaces 如何画出贝塞尔曲面</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mesh-Operations-Geometry-Processing-%E7%BD%91%E6%A0%BC"><span class="nav-number">5.2.</span> <span class="nav-text">Mesh Operations: Geometry Processing 网格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Subdivision-%E7%BB%86%E5%88%86"><span class="nav-number">5.3.</span> <span class="nav-text">Subdivision 细分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Loop-Subdivision%EF%BC%88%E5%8F%91%E6%98%8E%E8%80%85%E5%8F%ABLoop%EF%BC%89"><span class="nav-number">5.3.1.</span> <span class="nav-text">Loop Subdivision（发明者叫Loop）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E7%AE%97%E6%B3%95"><span class="nav-number">5.3.1.1.</span> <span class="nav-text">更新算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Catmull-Clark-Subdivision-General-Mesh"><span class="nav-number">5.3.2.</span> <span class="nav-text">Catmull-Clark Subdivision (General Mesh)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%86%E5%88%86%EF%BC%9A"><span class="nav-number">5.3.2.1.</span> <span class="nav-text">细分：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%EF%BC%9A"><span class="nav-number">5.3.2.2.</span> <span class="nav-text">更新：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mesh-Simplification"><span class="nav-number">5.4.</span> <span class="nav-text">Mesh Simplification</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Edge-Collapse-%E8%BE%B9%E5%9D%8D%E7%BC%A9"><span class="nav-number">5.4.1.</span> <span class="nav-text">Edge Collapse 边坍缩</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
