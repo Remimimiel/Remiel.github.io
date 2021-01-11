@@ -333,7 +333,7 @@ B^n_i(t)=\begin{pmatrix}n\\i\end{pmatrix}t^i(1-t)^{n-i}</script><p>其中</p>
 <p>光滑的曲线：控制杆共线，和中间的点等距离</p>
 <h3 id="连续性"><a href="#连续性" class="headerlink" title="连续性"></a>连续性</h3><p>$C^0$ 连续：几何上连在一起，第一段的终点为第二段的起点，$\mathbf{a}_n=\mathbf{b}_0$</p>
 <p><img src="/images/2020/12/27/Lecture10-12/20.png" alt="avatar"></p>
-<p>$C^1$ 连续：$\mathbf{a}<em>n=\mathbf{b}_0=\frac12(\mathbf{a}</em>{n-1}+\mathbf{b}_1)$</p>
+<p>$C^1$ 连续：$\mathbf{a}_n=\mathbf{b}_0=\frac12(\mathbf{a}_{n-1}+\mathbf{b}_1)$</p>
 <p><img src="/images/2020/12/27/Lecture10-12/21.png" alt="avatar"></p>
 <h2 id="其他曲线"><a href="#其他曲线" class="headerlink" title="其他曲线"></a>其他曲线</h2><h3 id="Spline-样条"><a href="#Spline-样条" class="headerlink" title="Spline 样条"></a>Spline 样条</h3><p>一条可控的曲线</p>
 <h3 id="B-splines-B样条"><a href="#B-splines-B样条" class="headerlink" title="B-splines B样条"></a>B-splines B样条</h3><p>奇函数 Basis</p>
@@ -630,6 +630,7 @@ B^n_i(t)=\begin{pmatrix}n\\i\end{pmatrix}t^i(1-t)^{n-i}</script><p>其中</p>
   if (typeof MathJax === 'undefined') {
     window.MathJax = {
       loader: {
+          load: ['[tex]/mhchem'],
         source: {
           '[tex]/amsCd': '[tex]/amscd',
           '[tex]/AMScd': '[tex]/amscd'
@@ -637,6 +638,7 @@ B^n_i(t)=\begin{pmatrix}n\\i\end{pmatrix}t^i(1-t)^{n-i}</script><p>其中</p>
       },
       tex: {
         inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
         tags: 'ams'
       },
       options: {

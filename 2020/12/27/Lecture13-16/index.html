@@ -20,20 +20,39 @@
     var CONFIG = {"hostname":"remimimiel.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="阴影">
+  <meta name="description" content="阴影，光线追踪，求交点，平面，包围盒，AABB，判断光线和AABB的交点">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Lecture13-16 Ray Tracing 光线追踪">
 <meta property="og:url" content="https://remimimiel.github.io/2020/12/27/Lecture13-16/index.html">
 <meta property="og:site_name" content="Remiel">
-<meta property="og:description" content="阴影">
+<meta property="og:description" content="阴影，光线追踪，求交点，平面，包围盒，AABB，判断光线和AABB的交点">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/01.png">
 <meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/02.png">
 <meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/03.png">
 <meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/04.png">
 <meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/05.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/06.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/07.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/08.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/09.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/10.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/11.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/12.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/13.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/14.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/15.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/16.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/17.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/18.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/19.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/20.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/21.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/22.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/23.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2020/12/27/Lecture13-16/24.png">
 <meta property="article:published_time" content="2020-12-27T11:24:25.000Z">
-<meta property="article:modified_time" content="2021-01-06T08:48:57.210Z">
+<meta property="article:modified_time" content="2021-01-11T08:53:29.915Z">
 <meta property="article:author" content="Remiel">
 <meta property="article:tag" content="图形学">
 <meta property="article:tag" content="GAMES101">
@@ -188,11 +207,11 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-06 16:48:57" itemprop="dateModified" datetime="2021-01-06T16:48:57+08:00">2021-01-06</time>
+                <time title="修改时间：2021-01-11 16:53:29" itemprop="dateModified" datetime="2021-01-11T16:53:29+08:00">2021-01-11</time>
               </span>
 
           
-            <div class="post-description">阴影</div>
+            <div class="post-description">阴影，光线追踪，求交点，平面，包围盒，AABB，判断光线和AABB的交点</div>
 
         </div>
       </header>
@@ -203,31 +222,245 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Shadow-Mapping"><a href="#Shadow-Mapping" class="headerlink" title="Shadow Mapping"></a>Shadow Mapping</h1><p>是一种图像空间的做法</p>
+        <h1 id="shadow-mapping">Shadow Mapping</h1>
+<p>是一种图像空间的做法</p>
 <ul>
 <li>生成阴影时不需要场景的几何信息</li>
 <li>有走样现象</li>
 </ul>
 <p>核心思想：</p>
 <p>不在阴影里的点一定同时能被光和摄像机看到</p>
-<h2 id="步骤："><a href="#步骤：" class="headerlink" title="步骤："></a>步骤：</h2><h3 id="1-Render-from-Light"><a href="#1-Render-from-Light" class="headerlink" title="1. Render from Light"></a>1. Render from Light</h3><p>从光源看向场景，记录<strong>从光源到所有点</strong>的深度（画深度图）</p>
-<p><img src="/images/2020/12/27/Lecture13-16/01.png" alt="avatar"></p>
-<h3 id="2-Render-from-Eye"><a href="#2-Render-from-Eye" class="headerlink" title="2. Render from Eye"></a>2. Render from Eye</h3><p>从摄像机出发，能看到一些点，将看到的点投影回光源</p>
-<p><img src="/images/2020/12/27/Lecture13-16/02.png" alt="avatar"></p>
+<h2 id="步骤">步骤：</h2>
+<h3 id="render-from-light">1. Render from Light</h3>
+<p>从光源看向场景，记录<strong>从光源到所有点</strong>的深度（画深度图）</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/01.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h3 id="render-from-eye">2. Render from Eye</h3>
+<p>从摄像机出发，能看到一些点，将看到的点投影回光源</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/02.png" alt><figcaption>avatar</figcaption>
+</figure>
 <p>如果<strong>从点到光源的深度</strong>和<strong>从光源到点的深度</strong>一致，说明这个点能被光源看到，可见</p>
-<p><img src="/images/2020/12/27/Lecture13-16/03.png" alt="avatar"></p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/03.png" alt><figcaption>avatar</figcaption>
+</figure>
 <p>如果<strong>从点到光源的深度</strong>和<strong>从光源到点的深度</strong>不一致，说明这个点不能被光源看到，不可见</p>
-<p><img src="/images/2020/12/27/Lecture13-16/04.png" alt="avatar"></p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/04.png" alt><figcaption>avatar</figcaption>
+</figure>
 <p>例子见ppt</p>
-<h2 id="问题："><a href="#问题：" class="headerlink" title="问题："></a>问题：</h2><ul>
+<h2 id="问题">问题：</h2>
+<ul>
 <li>只能做硬阴影</li>
 <li>阴影图的分辨率，shadow map分辨率低但场景分辨率高，阴影信息是走样的</li>
 <li>数值精度，浮点数比较问题，引入scale，bias，tolerance</li>
 </ul>
-<h3 id="硬阴影VS软阴影"><a href="#硬阴影VS软阴影" class="headerlink" title="硬阴影VS软阴影"></a>硬阴影VS软阴影</h3><p>锐利边缘vs模糊边缘</p>
-<p>本影 $\rightarrow$ 伴影 $\rightarrow$ 影子之外</p>
+<h3 id="硬阴影vs软阴影">硬阴影VS软阴影</h3>
+<p>锐利边缘vs模糊边缘</p>
+<p>本影 <span class="math inline">\(\rightarrow\)</span> 伴影 <span class="math inline">\(\rightarrow\)</span> 影子之外</p>
 <p>软阴影出现在光源有一定大小的情况</p>
-<p><img src="/images/2020/12/27/Lecture13-16/05.png" alt="avatar"></p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/05.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h1 id="ray-tracing-光线追踪">Ray Tracing 光线追踪</h1>
+<h2 id="为什么要引入光线追踪">为什么要引入光线追踪？</h2>
+<ul>
+<li>光栅化无法很好地表现全局的效果，如
+<ul>
+<li>软阴影，毛玻璃效果，间接光照</li>
+<li>尤其是光线反射不止一次</li>
+</ul></li>
+</ul>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/06.png" alt><figcaption>avatar</figcaption>
+</figure>
+<ul>
+<li><p>光栅化是一种 快，但是近似 的渲染方法，细节程度低</p></li>
+<li><p>光线追踪准确，但是慢</p>
+<ul>
+<li>光栅化：实时（游戏） 光线追踪：离线（电影）</li>
+<li>大约10k CPU core hours渲染一帧</li>
+</ul></li>
+</ul>
+<h2 id="基础的光线追踪算法">基础的光线追踪算法</h2>
+<p>关于光线的基本假设：</p>
+<ol type="1">
+<li>光线沿着直线传播（虽然实际上有波动性）</li>
+<li>光线和光线不会发生碰撞</li>
+<li>光线一定从光源发出，打到场景中，经过反射和折射最终进入人的眼睛</li>
+</ol>
+<p>光线传播的性质：<strong>光路的可逆性</strong>——可以认为是眼睛发出了感知的光线，沿着光路达到光源</p>
+<h3 id="光线投射-ray-casting">光线投射 Ray Casting</h3>
+<p>从眼睛（相机）开始，向成像平面（image plane）看，对于每一个像素，从摄像机向像素连线并穿过这个像素（eye ray），连线会达到场景中的某个最近的位置（closest scene  intersection point），如果连线（光路）和某个物体相交即说明沿着这个方向看到了这个点，然后将这个点和光源连线（shadow ray），判定这个点是否对光源也可见，即是不是在阴影里，如果不在阴影里则可以连线，于是形成了一条有效的光路：光源-&gt;点-&gt;眼睛，之后进行着色等步骤</p>
+<p>closest scene  intersection point 顺便解决了深度测试的问题</p>
+<p>投出光线 -&gt; 和场景相交，求最近交点 -&gt; 和光源连线，判定是否对光源可见 -&gt; 着色写回像素的值</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/07.png" alt><figcaption>avatar</figcaption>
+</figure>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/08.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h3 id="recursive-whitted-style-ray-tracing">Recursive (Whitted-Style) Ray Tracing</h3>
+<p>witted风格：在打到物体的点上时，光线可以继续传播</p>
+<p>可以进行折射再反射，效果如下：</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/09.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>首先从光线投射开始，每个像素找到最近的一个点，此处为玻璃球</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/10.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>考虑在这个点上的反射和折射</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/11.png" alt><figcaption>avatar</figcaption>
+</figure>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/12.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>由于光线弹射次数多，在每一个弹射的点都应计算着色的值，即都与光源连线，看光源能否照亮这些点</p>
+<p>最后所有能照亮的点计算的着色都会加到像素的值里去</p>
+<p>光线的能量会有衰减，primary ray，secondary rays，……</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/13.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h2 id="ray-surface-intersection-求交点">Ray-Surface Intersection 求交点</h2>
+<p>求光线和物体表面的交点</p>
+<p>光线定义为起点O和方向d</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/14.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>光线上的任意一个点都能定义为下式： <span class="math display">\[
+\pmb{r}(t)=\pmb{o}+t\pmb{d}\quad 0\le t&lt;\infty
+\]</span></p>
+<ul>
+<li>r：光线上的点</li>
+<li>t：时间</li>
+<li>o：原点</li>
+<li>d：正规化后的方向</li>
+</ul>
+<p>r点在t时间为起始位置加上t方向</p>
+<h3 id="光线与球作交点">光线与球作交点</h3>
+<p>光线：<span class="math inline">\(\pmb{r}(t)=\pmb{o}+t\pmb{d}\quad 0\le t&lt;\infty\)</span></p>
+<p>球：<span class="math inline">\(\pmb{p}:(\pmb{p}-\pmb{c})^2-R^2=0\)</span> （球上的任何一个点到球心c的距离都等于半径）</p>
+<ul>
+<li>数学上如何定义一个交点？
+<ul>
+<li>这个点又在光线上又在球上，两个函数都满足</li>
+</ul></li>
+</ul>
+<p>联立可得：<span class="math inline">\((\pmb{o}+t\pmb{d}-\pmb{c})^2-R^2=0\)</span></p>
+<p>可由求根公式解得t</p>
+<p>相离/相切/相交</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/15.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h3 id="光线与一般的隐式表面implicit-surface求交">光线与一般的隐式表面(Implicit Surface)求交</h3>
+<p>光线：<span class="math inline">\(\pmb{r}(t)=\pmb{o}+t\pmb{d}\quad 0\le t&lt;\infty\)</span></p>
+<p>隐式表面：<span class="math inline">\(\pmb{p}:f(\pmb{p})=0\)</span></p>
+<p>联立：<span class="math inline">\(f(\pmb{o}+t\pmb{d})=0\)</span></p>
+<p>求解它们的<strong>正实根</strong>（需要具有物理意义）</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/16.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h3 id="光线与显式表面求交光线与三角形求交">光线与显式表面求交（光线与三角形求交）</h3>
+<p>为什么？</p>
+<ul>
+<li>渲染方面：可见性，阴影，光照，……</li>
+<li>几何方面：通过光线与三角形求交，可以判断点是否在物体内。如果点在物体内，从这个点射出的光线（射线）与三角形的交点一定是奇数个</li>
+</ul>
+<p>如何计算光线与三角形的交点？</p>
+<ul>
+<li>最简单的方法：一个一个三角形地判断是否与光线有交点</li>
+<li>简单，但是很慢（但是可以加速）</li>
+<li>任何一个三角形和给定的光线，要么0个交点，要么1个交点</li>
+</ul>
+<p>三角形是一个平面，则可以分解成如下步骤：</p>
+<ul>
+<li>光线和平面求交</li>
+<li>判定交点是否在三角形内</li>
+</ul>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/17.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h2 id="平面的定义">平面的定义</h2>
+<p>平面可以定义成一个方向和一个点，即定义一个法线以及平面过哪个点</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/18.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>任意p点和平面内给定的p'点的连线都和法线N垂直</p>
+<p>平面等式（如果p满足此式，则p在这个平面上）： <span class="math display">\[
+\pmb{p}:(\pmb{p}-\pmb{p}&#39;)\cdot \pmb{N}=0\quad \quad \quad ax+by+cz+d=0
+\]</span> p为平面上任意的点，p'为平面上的一个给定点，N为法向量</p>
+<p>## 求光线和平面的交点</p>
+<p>联立光线方程和平面方程 <span class="math display">\[
+t=\frac{(\pmb{p}&#39;-\pmb{o})\cdot \pmb{N}}{\pmb{d}\cdot \pmb{N}}
+\quad\quad\quad 0\le t&lt;\infty
+\]</span> <img src="/images/2020/12/27/Lecture13-16/19.png" alt="avatar"></p>
+<h3 id="光线和三角形求交-möller-trumbore-algorithm">光线和三角形求交 Möller Trumbore Algorithm</h3>
+<ul>
+<li>一步到位求光线和三角形平面交点是否在三角形内</li>
+<li>等号左边是光线方程，右边是重心坐标，光线上的点在三角形内，则可以用重心坐标描述</li>
+<li><span class="math display">\[b_1\]</span>、<span class="math display">\[b_2\]</span> 和 <span class="math display">\[1-b_1-b_2\]</span> 非负，则点在三角形内</li>
+<li>通过重心坐标判断</li>
+</ul>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/20.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>## 加快光线和三角形表面求交的速度</p>
+<ul>
+<li>原始方法：求每一根光线和所有三角形的交点，求出最近的一个（最小的t）
+<ul>
+<li>问题：非常缓慢，需要计算<span class="math inline">\(pixels\times triangles(\times bounces)\)</span>（pixel指光源，因为光路可逆；bounces指光线弹射）</li>
+</ul></li>
+</ul>
+<h2 id="包围盒-bounding-volumes">包围盒 Bounding Volumes</h2>
+<ul>
+<li>对于一个复杂的物体，可以用一个相对简单的形状包起来， 保证复杂的物体一定在简单形状之内</li>
+<li>如果一条光线连包围盒都碰不到，那更不可能碰到包围盒内的物体</li>
+<li>所以先判断包围盒，如果碰到包围盒了再判断物体</li>
+</ul>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/21.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h2 id="axis-aligned-bounding-box-aabb-轴对包围盒">Axis-Aligned Bounding Box (AABB) 轴对⻬包围盒</h2>
+<p>新的理解：长方体是三个不同的<strong>对面 (slab) </strong>形成的交集</p>
+<p>为什么要引入<strong>对面</strong>的概念：常用的包围盒是 <strong>Axis-Aligned Bounding Box (AABB) 轴对⻬包围盒</strong>，包围盒的每一面都沿着坐标轴</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/22.png" alt><figcaption>avatar</figcaption>
+</figure>
+<h2 id="如何判定光线和轴对齐包围盒是否有交点">如何判定光线和轴对齐包围盒是否有交点</h2>
+<ul>
+<li>以二维为例：两个对面形成的交集，对任意一组对面都能求出光线进入的时间和出去的时间
+<ul>
+<li>与 <span class="math inline">\(x\)</span> 平面：在 <span class="math inline">\(t_{min}\)</span> 时间与左边的面有交点，在 <span class="math inline">\(t_{max}\)</span> 时间与右边的面有交点</li>
+<li>与 <span class="math inline">\(y\)</span> 平面：在 <span class="math inline">\(t_{min}\)</span> 时间与下边的面有交点（<span class="math inline">\(t_{min}&lt;0\)</span>），在 <span class="math inline">\(t_{max}\)</span> 时间与上边的面有交点</li>
+<li>两个结果求交集</li>
+</ul></li>
+</ul>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/23.png" alt><figcaption>avatar</figcaption>
+</figure>
+<p>### 如何知道光线什么时候与盒子相交？</p>
+<ul>
+<li>只有当光线进入了所有的对面时，能断言光线进入了盒子</li>
+<li>只要光线离开任意一对对面，则可以断言光线离开了盒子</li>
+</ul>
+<p>算法：</p>
+<ul>
+<li>对于3D盒子的每一组对面，计算 <span class="math inline">\(t_{min}\)</span> 和 <span class="math inline">\(t_{max}\)</span></li>
+<li>得到 <span class="math inline">\(t_{enter}=max\{t_{min}\}\)</span> ， <span class="math inline">\(t_{exit}=min\{t_{max}\}\)</span></li>
+<li>如果 <span class="math inline">\(t_{enter}&lt;t_{exit}\)</span> ，则光线在盒子里呆了一段时间，否则不相交</li>
+<li>光线不是直线而是射线，所以t不可能为负</li>
+<li>如果 <span class="math inline">\(t_{exit}&lt;0\)</span> ，说明盒子在光源背后，则不可能有交点</li>
+<li>如果 <span class="math inline">\(t_{exit}\ge0\)</span> 且 <span class="math inline">\(t_{enter}&lt;0\)</span> ，说明光源在盒子里，一定有交点</li>
+</ul>
+<p>总结：光线和AABB有交点，当且仅当<span class="math inline">\(t_{enter}&lt;t_{exit}\)</span> &amp;&amp; <span class="math inline">\(t_{exit}\ge0\)</span></p>
+<h3 id="为什么用axis-aligned">为什么用Axis-Aligned？</h3>
+<p>当平面和坐标轴平行的时候，计算更简单</p>
+<figure>
+<img src="/images/2020/12/27/Lecture13-16/24.png" alt><figcaption>avatar</figcaption>
+</figure>
 
     </div>
 
@@ -312,7 +545,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Shadow-Mapping"><span class="nav-number">1.</span> <span class="nav-text">Shadow Mapping</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">步骤：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Render-from-Light"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. Render from Light</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Render-from-Eye"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. Render from Eye</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A1%AC%E9%98%B4%E5%BD%B1VS%E8%BD%AF%E9%98%B4%E5%BD%B1"><span class="nav-number">1.2.1.</span> <span class="nav-text">硬阴影VS软阴影</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#shadow-mapping"><span class="nav-number">1.</span> <span class="nav-text">Shadow Mapping</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.1.</span> <span class="nav-text">步骤：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#render-from-light"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. Render from Light</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#render-from-eye"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. Render from Eye</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.</span> <span class="nav-text">问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A1%AC%E9%98%B4%E5%BD%B1vs%E8%BD%AF%E9%98%B4%E5%BD%B1"><span class="nav-number">1.2.1.</span> <span class="nav-text">硬阴影VS软阴影</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ray-tracing-%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA"><span class="nav-number">2.</span> <span class="nav-text">Ray Tracing 光线追踪</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BC%95%E5%85%A5%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA"><span class="nav-number">2.1.</span> <span class="nav-text">为什么要引入光线追踪？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9A%84%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">基础的光线追踪算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E7%BA%BF%E6%8A%95%E5%B0%84-ray-casting"><span class="nav-number">2.2.1.</span> <span class="nav-text">光线投射 Ray Casting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#recursive-whitted-style-ray-tracing"><span class="nav-number">2.2.2.</span> <span class="nav-text">Recursive (Whitted-Style) Ray Tracing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ray-surface-intersection-%E6%B1%82%E4%BA%A4%E7%82%B9"><span class="nav-number">2.3.</span> <span class="nav-text">Ray-Surface Intersection 求交点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E7%BA%BF%E4%B8%8E%E7%90%83%E4%BD%9C%E4%BA%A4%E7%82%B9"><span class="nav-number">2.3.1.</span> <span class="nav-text">光线与球作交点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E7%BA%BF%E4%B8%8E%E4%B8%80%E8%88%AC%E7%9A%84%E9%9A%90%E5%BC%8F%E8%A1%A8%E9%9D%A2implicit-surface%E6%B1%82%E4%BA%A4"><span class="nav-number">2.3.2.</span> <span class="nav-text">光线与一般的隐式表面(Implicit Surface)求交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E7%BA%BF%E4%B8%8E%E6%98%BE%E5%BC%8F%E8%A1%A8%E9%9D%A2%E6%B1%82%E4%BA%A4%E5%85%89%E7%BA%BF%E4%B8%8E%E4%B8%89%E8%A7%92%E5%BD%A2%E6%B1%82%E4%BA%A4"><span class="nav-number">2.3.3.</span> <span class="nav-text">光线与显式表面求交（光线与三角形求交）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E9%9D%A2%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">2.4.</span> <span class="nav-text">平面的定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E7%BA%BF%E5%92%8C%E4%B8%89%E8%A7%92%E5%BD%A2%E6%B1%82%E4%BA%A4-mo%CC%88ller-trumbore-algorithm"><span class="nav-number">2.4.1.</span> <span class="nav-text">光线和三角形求交 Möller Trumbore Algorithm</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%85%E5%9B%B4%E7%9B%92-bounding-volumes"><span class="nav-number">2.5.</span> <span class="nav-text">包围盒 Bounding Volumes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#axis-aligned-bounding-box-aabb-%E8%BD%B4%E5%AF%B9%E5%8C%85%E5%9B%B4%E7%9B%92"><span class="nav-number">2.6.</span> <span class="nav-text">Axis-Aligned Bounding Box (AABB) 轴对⻬包围盒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A4%E5%AE%9A%E5%85%89%E7%BA%BF%E5%92%8C%E8%BD%B4%E5%AF%B9%E9%BD%90%E5%8C%85%E5%9B%B4%E7%9B%92%E6%98%AF%E5%90%A6%E6%9C%89%E4%BA%A4%E7%82%B9"><span class="nav-number">2.7.</span> <span class="nav-text">如何判定光线和轴对齐包围盒是否有交点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8axis-aligned"><span class="nav-number">2.7.1.</span> <span class="nav-text">为什么用Axis-Aligned？</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -423,6 +656,7 @@
   if (typeof MathJax === 'undefined') {
     window.MathJax = {
       loader: {
+          load: ['[tex]/mhchem'],
         source: {
           '[tex]/amsCd': '[tex]/amscd',
           '[tex]/AMScd': '[tex]/amscd'
@@ -430,6 +664,7 @@
       },
       tex: {
         inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
         tags: 'ams'
       },
       options: {

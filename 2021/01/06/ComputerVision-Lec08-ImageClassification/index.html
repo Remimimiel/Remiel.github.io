@@ -447,6 +447,7 @@ L=\frac1N\sum_i-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}
   if (typeof MathJax === 'undefined') {
     window.MathJax = {
       loader: {
+          load: ['[tex]/mhchem'],
         source: {
           '[tex]/amsCd': '[tex]/amscd',
           '[tex]/AMScd': '[tex]/amscd'
@@ -454,6 +455,7 @@ L=\frac1N\sum_i-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}
       },
       tex: {
         inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
         tags: 'ams'
       },
       options: {

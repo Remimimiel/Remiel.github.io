@@ -482,6 +482,7 @@ M_{viewport}
   if (typeof MathJax === 'undefined') {
     window.MathJax = {
       loader: {
+          load: ['[tex]/mhchem'],
         source: {
           '[tex]/amsCd': '[tex]/amscd',
           '[tex]/AMScd': '[tex]/amscd'
@@ -489,6 +490,7 @@ M_{viewport}
       },
       tex: {
         inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
         tags: 'ams'
       },
       options: {
