@@ -20,20 +20,24 @@
     var CONFIG = {"hostname":"remimimiel.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="图像分类">
+  <meta name="description" content="LeetCode春招学习计划I：时间复杂度与空间复杂度，技术面试考点汇总，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ComputerVision_Lec08_ImageClassification">
-<meta property="og:url" content="https://remimimiel.github.io/2021/01/06/ComputerVision-Lec08-ImageClassification/index.html">
+<meta property="og:title" content="春招学习计划I">
+<meta property="og:url" content="https://remimimiel.github.io/2021/01/22/%E6%98%A5%E6%8B%9B%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92I/index.html">
 <meta property="og:site_name" content="Remiel">
-<meta property="og:description" content="图像分类">
+<meta property="og:description" content="LeetCode春招学习计划I：时间复杂度与空间复杂度，技术面试考点汇总，">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-01-06T08:22:45.000Z">
-<meta property="article:modified_time" content="2021-01-06T11:58:39.204Z">
+<meta property="og:image" content="https://remimimiel.github.io/images/2021/22/春招学习计划I/1.png">
+<meta property="og:image" content="https://remimimiel.github.io/images/2021/22/春招学习计划I/2.png">
+<meta property="article:published_time" content="2021-01-22T08:24:11.000Z">
+<meta property="article:modified_time" content="2021-01-22T12:19:52.202Z">
 <meta property="article:author" content="Remiel">
-<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="数据结构和算法">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://remimimiel.github.io/images/2021/22/春招学习计划I/1.png">
 
-<link rel="canonical" href="https://remimimiel.github.io/2021/01/06/ComputerVision-Lec08-ImageClassification/">
+<link rel="canonical" href="https://remimimiel.github.io/2021/01/22/%E6%98%A5%E6%8B%9B%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92I/">
 
 
 <script id="page-configurations">
@@ -46,7 +50,7 @@
   };
 </script>
 
-  <title>ComputerVision_Lec08_ImageClassification | Remiel</title>
+  <title>春招学习计划I | Remiel</title>
   
 
 
@@ -151,7 +155,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://remimimiel.github.io/2021/01/06/ComputerVision-Lec08-ImageClassification/">
+    <link itemprop="mainEntityOfPage" href="https://remimimiel.github.io/2021/01/22/%E6%98%A5%E6%8B%9B%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92I/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -164,7 +168,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ComputerVision_Lec08_ImageClassification
+          春招学习计划I
         </h1>
 
         <div class="post-meta">
@@ -175,11 +179,11 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-06 16:22:45 / 修改时间：19:58:39" itemprop="dateCreated datePublished" datetime="2021-01-06T16:22:45+08:00">2021-01-06</time>
+              <time title="创建时间：2021-01-22 16:24:11 / 修改时间：20:19:52" itemprop="dateCreated datePublished" datetime="2021-01-22T16:24:11+08:00">2021-01-22</time>
             </span>
 
           
-            <div class="post-description">图像分类</div>
+            <div class="post-description">LeetCode春招学习计划I：时间复杂度与空间复杂度，技术面试考点汇总，</div>
 
         </div>
       </header>
@@ -190,73 +194,42 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Image-Classification-图像分类"><a href="#Image-Classification-图像分类" class="headerlink" title="Image Classification 图像分类"></a>Image Classification 图像分类</h1><ul>
-<li>输入：图像</li>
-<li>输出：图像的标签</li>
-<li>标签用于训练</li>
-</ul>
-<h2 id="Training-amp-Testing-a-Classifier"><a href="#Training-amp-Testing-a-Classifier" class="headerlink" title="Training &amp; Testing a Classifier"></a>Training &amp; Testing a Classifier</h2><ul>
-<li>收集带标签的图像</li>
-<li>使用机器学习训练图像分类器</li>
-<li>使用测试集评估分类器</li>
-</ul>
-<h2 id="Classifiers-分类器"><a href="#Classifiers-分类器" class="headerlink" title="Classifiers 分类器"></a>Classifiers 分类器</h2><ul>
-<li>Nearest Neighbor 最近邻分类器</li>
-<li>kNN (“k-Nearest Neighbors”) • Linear Classifier k最近邻分类器</li>
-<li>Neural Network 神经网络</li>
-<li>Deep Neural Network 深度神经网络</li>
-</ul>
-<h3 id="Nearest-Neighbor-NN-Classifier"><a href="#Nearest-Neighbor-NN-Classifier" class="headerlink" title="Nearest Neighbor (NN) Classifier"></a>Nearest Neighbor (NN) Classifier</h3><ul>
-<li>训练<ul>
-<li>记住所有训练图像和标签</li>
-</ul>
-</li>
-<li>预测<ul>
-<li>找到所有与测试图片最近的（最相似的）训练图片</li>
-<li>预测测试图片的标签</li>
-</ul>
-</li>
-</ul>
-<h3 id="k-nearest-neighbor"><a href="#k-nearest-neighbor" class="headerlink" title="k-nearest neighbor"></a>k-nearest neighbor</h3><ul>
-<li>在训练数据中找到k个距离测试数据最近的点</li>
-<li>使用多数投票算法</li>
-</ul>
-<h4 id="如何定义图像之间的距离"><a href="#如何定义图像之间的距离" class="headerlink" title="如何定义图像之间的距离"></a>如何定义图像之间的距离</h4><p>L1距离：</p>
-<script type="math/tex; mode=display">
-d_1(I_1,I_2)=\sum_p|I_1^p-I_2^p|</script><p>逐像素求差的绝对值，图像为对角线在坐标轴上的正方形</p>
-<p>L2距离：</p>
-<script type="math/tex; mode=display">
-d_2(I_1,I_2)=\sqrt{\sum_p(I_1^p-I_2^p)^2}</script><p>图像为圆心在原点的圆形</p>
-<h4 id="超参数"><a href="#超参数" class="headerlink" title="超参数"></a>超参数</h4><ul>
-<li>最佳的距离？L1还是L2？</li>
-<li>最佳的k？</li>
-<li>无法通过学习决定的参数</li>
-</ul>
-<h5 id="交叉验证集-Validation-set"><a href="#交叉验证集-Validation-set" class="headerlink" title="交叉验证集 Validation set"></a>交叉验证集 Validation set</h5><p>将数据分为k折交叉验证集和测试集，训练时使用交叉验证集以外的训练集，然后用交叉验证集评估结果；将k个交叉验证集轮流使用一遍</p>
-<h3 id="线性分类器-Linear-Classification"><a href="#线性分类器-Linear-Classification" class="headerlink" title="线性分类器 Linear Classification"></a>线性分类器 Linear Classification</h3><ul>
-<li>定义Score Function</li>
-</ul>
-<script type="math/tex; mode=display">
-f(x_i,W,b)=Wx_i+b</script><p>f为分类的得分 class scores，W为权重 weights，xi为数据（图像），b为偏置向量</p>
+        <h1 id="时间复杂度与空间复杂度">时间复杂度与空间复杂度</h1>
+<h2 id="常见的时间复杂度计算规则">常见的时间复杂度计算规则</h2>
+<h3 id="常数加法系数看做-0">1. 常数加法系数看做 0</h3>
+<p>一段程序必须要做的操作（常数次操作）不纳入复杂度的计算。一般而言，常数次操作都不会是造成程序性能瓶颈的原因。</p>
+<h3 id="对于一个多项式只保留最高次幂的项并且乘法系数化简成-1">2. 对于一个多项式，只保留最高次幂的项，并且乘法系数化简成 1</h3>
+<p>常见结论：</p>
 <ul>
-<li>定义损失函数 Loss Function</li>
+<li>一次遍历，里面不再有循环的操作，时间复杂度是 <span class="math inline">\(O(N)\)</span>。也就是说，我们把输入数据里所有的元素看一遍，就可以得到结果。这样的算法称为具有线性复杂度的算法。</li>
+<li>双重循环，内外层都与输入规模相关的时候，时间复杂度是 <span class="math inline">\(O(N^2)\)</span> 。 <span class="math inline">\(O(N^2)\)</span> 级别的复杂度我们会在第 3 章「选择排序」和「插入排序」章节向大家介绍。</li>
 </ul>
-<script type="math/tex; mode=display">
-L=\frac1N\sum_iL_i(f(x_i,W),y_i)</script><p>xi为图片，yi为类别</p>
-<p>线性分类器中：</p>
-<script type="math/tex; mode=display">
-L_i=f(x_i,W)-y_i</script><h3 id="Softmax-分类器"><a href="#Softmax-分类器" class="headerlink" title="Softmax 分类器"></a>Softmax 分类器</h3><ul>
-<li>softmax函数：</li>
-</ul>
-<script type="math/tex; mode=display">
-\frac{e^{f_{y_i}}}{\sum_je^{f_j}}</script><ul>
-<li>交叉熵损失函数</li>
-</ul>
-<script type="math/tex; mode=display">
-L_i=-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}\\
-L_i=-f_{y_i}+log\sum_je^{f_j}</script><p>最终的损失函数为：</p>
-<script type="math/tex; mode=display">
-L=\frac1N\sum_i-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}+\lambda\sum_k\sum_lW_{k,l}^2</script>
+<p>注意：有些算法形式上是双重循环，但事实上，程序只遍历了数组一次或者若干次，这样的算法时间复杂度为 <span class="math inline">\(O(N)\)</span> ，以后遇到这一类问题的时候再向大家说明。</p>
+<h3 id="对数或者是含有对数乘法因子的项对数底都看作-2">3. 对数或者是含有对数乘法因子的项，对数底都看作 2</h3>
+<p>对数级别的时间复杂度，常见且典型的算法是「二分查找」，时间复杂度的表达式为 <span class="math inline">\(O(logN)\)</span>。</p>
+<p>下面我们介绍为什么底数都看成 2。如果一个算法计算出来的输入规模 <span class="math inline">\(N\)</span> 与算法执行次数的表达式为 <span class="math inline">\(log_{10}N\)</span> ，那么根据高中数学学习过的对数换底公式： <span class="math display">\[
+log_ab=\frac{log_cb}{log_ca}
+\]</span> 有 <span class="math inline">\(log_{10}N=\frac{log_2N}{log_210}=\frac1{log_210}log_2N\)</span>，常数乘法系数项 <span class="math inline">\(\frac1{log_210}\)</span> 视为1，因此写 <span class="math inline">\(O(log_{10}N)\)</span> 等价于 <span class="math inline">\(O(log_2N)\)</span>，统一记为 <span class="math inline">\(O(logN)\)</span>。</p>
+<h2 id="绝大多数时候关注最坏情况">绝大多数时候关注最坏情况</h2>
+<p>一个程序最坏的情况我们都可以接受，那么最好的情况当然是没有问题的，这就像我们常说的「做最好的准备，最坏的打算」一样。</p>
+<p>当然也有例外：如果一个程序，我们采用了一些手段，导致了最坏情况出现的概率大大降低，那么我们会约定俗成地将时间复杂度定义成「一般情况」，也就是说「最坏情况」几乎不可能发生的话，我们就把「一般情况」当成「最坏情况」。</p>
+<h2 id="总结">总结</h2>
+<ol type="1">
+<li>时间复杂度的概念很重要，除了一些复杂的算法，例如「带剪枝」的「回溯算法」，复杂度的分析很复杂，一般情况下不要求分析；</li>
+<li>时间复杂度需要动态去理解，看到一个复杂度的表达式，我们需要想到：当输入规模扩大多少倍的时候，程序的执行时间相应扩大了多少倍；</li>
+<li>对于时间复杂度的优化比空间复杂度重要得多；</li>
+<li>复杂度分析还有「均摊复杂度分析」和「震荡时间复杂度分析」，我们遇到具体问题的时候再和大家做介绍；</li>
+<li>复杂度分析还有一个非常重要的理论：「主定理」，我们也会在后续的课程里向大家介绍。</li>
+</ol>
+<h1 id="技术面试考点汇总">技术面试考点汇总</h1>
+<p>力扣为大家汇总了互联网公司技术面试中经常考察的问题类型。</p>
+<p>无论你是面试什么岗位，面试官基本都会从以下几个方面全面考察候选人的技术水平。当然，除了这些面试考点以外，你还需要了解目标岗位的其他技术要求，及时查漏补缺，充分备战技术面试。</p>
+<p><img src="/images/2021/22/春招学习计划I/1.png"></p>
+<p>算法和数据结构一直是技术面试的重点和难点。近年来，很多知名企业如谷歌, 脸书等在面试过程中都会有特定的电话面试环节, 专门用来面算法题。这些企业通常会使用在线协同代码编程网站，需要面试者用一小时解决 4 道算法问题，面试官可以实时看到候选人所写的代码。除了远程面试外, 在 Onsite 面试中还会有白板写代码等环节。</p>
+<p>力扣也为各位技术求职者们总结了一张算法和数据结构的考点类型汇总图，大家可以根据思维导图里的内容进行系统地学习。</p>
+<p><img src="/images/2021/22/春招学习计划I/2.png"></p>
+<p>如果你对图中的知识点还不是很熟悉，可以先去力扣 <a target="_blank" rel="noopener" href="https://leetcode-cn.com/leetbook/">LeetBook</a> 进行主题练习，每个卡片都有对应的知识点讲解，可以帮助你快速入门。或者你也可以通过 <a target="_blank" rel="noopener" href="https://leetcode-cn.com/problemset/all/">题库页</a> 的题目标签进行专项练习，遇到不会的题目时可以先将这道题目「收藏」，然后去题解区看看其他用户的解题思路，在看题解时需做好笔记，思考哪个环节自己没有想到，及时调整自己的思路，亲自写出最优的解法，并趁热打铁多做几道类似的题目加以巩固。在准备面试时，也要预留一定的复习时间，这时候你就可以打开自己的收藏夹，再次巩固一下曾经不会的题目。</p>
+
     </div>
 
     
@@ -265,7 +238,8 @@ L=\frac1N\sum_i-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/" rel="tag"># 数据结构和算法</a>
           </div>
 
         
@@ -274,13 +248,10 @@ L=\frac1N\sum_i-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/12/27/Lecture13-16/" rel="prev" title="Lecture13-16 Ray Tracing 光线追踪">
-      <i class="fa fa-chevron-left"></i> Lecture13-16 Ray Tracing 光线追踪
+    <a href="/2021/01/06/ComputerVision-Lec08-ImageClassification/" rel="prev" title="ComputerVision_Lec08_ImageClassification">
+      <i class="fa fa-chevron-left"></i> ComputerVision_Lec08_ImageClassification
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/01/22/%E6%98%A5%E6%8B%9B%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92I/" rel="next" title="春招学习计划I">
-      春招学习计划I <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -339,7 +310,7 @@ L=\frac1N\sum_i-log\begin{pmatrix}\frac{e^{f_{y_i}}}{\sum_je^{f_j}}\end{pmatrix}
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Image-Classification-%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">Image Classification 图像分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Training-amp-Testing-a-Classifier"><span class="nav-number">1.1.</span> <span class="nav-text">Training &amp; Testing a Classifier</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Classifiers-%E5%88%86%E7%B1%BB%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text">Classifiers 分类器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nearest-Neighbor-NN-Classifier"><span class="nav-number">1.2.1.</span> <span class="nav-text">Nearest Neighbor (NN) Classifier</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#k-nearest-neighbor"><span class="nav-number">1.2.2.</span> <span class="nav-text">k-nearest neighbor</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9A%E4%B9%89%E5%9B%BE%E5%83%8F%E4%B9%8B%E9%97%B4%E7%9A%84%E8%B7%9D%E7%A6%BB"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">如何定义图像之间的距离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E5%8F%82%E6%95%B0"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">超参数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E9%AA%8C%E8%AF%81%E9%9B%86-Validation-set"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">交叉验证集 Validation set</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E5%88%86%E7%B1%BB%E5%99%A8-Linear-Classification"><span class="nav-number">1.2.3.</span> <span class="nav-text">线性分类器 Linear Classification</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Softmax-%E5%88%86%E7%B1%BB%E5%99%A8"><span class="nav-number">1.2.4.</span> <span class="nav-text">Softmax 分类器</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E4%B8%8E%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">1.</span> <span class="nav-text">时间复杂度与空间复杂度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E8%AE%A1%E7%AE%97%E8%A7%84%E5%88%99"><span class="nav-number">1.1.</span> <span class="nav-text">常见的时间复杂度计算规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E6%95%B0%E5%8A%A0%E6%B3%95%E7%B3%BB%E6%95%B0%E7%9C%8B%E5%81%9A-0"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. 常数加法系数看做 0</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E4%B8%80%E4%B8%AA%E5%A4%9A%E9%A1%B9%E5%BC%8F%E5%8F%AA%E4%BF%9D%E7%95%99%E6%9C%80%E9%AB%98%E6%AC%A1%E5%B9%82%E7%9A%84%E9%A1%B9%E5%B9%B6%E4%B8%94%E4%B9%98%E6%B3%95%E7%B3%BB%E6%95%B0%E5%8C%96%E7%AE%80%E6%88%90-1"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 对于一个多项式，只保留最高次幂的项，并且乘法系数化简成 1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E6%95%B0%E6%88%96%E8%80%85%E6%98%AF%E5%90%AB%E6%9C%89%E5%AF%B9%E6%95%B0%E4%B9%98%E6%B3%95%E5%9B%A0%E5%AD%90%E7%9A%84%E9%A1%B9%E5%AF%B9%E6%95%B0%E5%BA%95%E9%83%BD%E7%9C%8B%E4%BD%9C-2"><span class="nav-number">1.1.3.</span> <span class="nav-text">3. 对数或者是含有对数乘法因子的项，对数底都看作 2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%9D%E5%A4%A7%E5%A4%9A%E6%95%B0%E6%97%B6%E5%80%99%E5%85%B3%E6%B3%A8%E6%9C%80%E5%9D%8F%E6%83%85%E5%86%B5"><span class="nav-number">1.2.</span> <span class="nav-text">绝大多数时候关注最坏情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E9%9D%A2%E8%AF%95%E8%80%83%E7%82%B9%E6%B1%87%E6%80%BB"><span class="nav-number">2.</span> <span class="nav-text">技术面试考点汇总</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
