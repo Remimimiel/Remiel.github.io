@@ -28,7 +28,7 @@
 <meta property="og:description" content="LeetCode 春招学习计划II 笔记">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-01-25T01:38:07.000Z">
-<meta property="article:modified_time" content="2021-01-25T02:38:26.087Z">
+<meta property="article:modified_time" content="2021-01-27T04:23:36.453Z">
 <meta property="article:author" content="Remiel">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="字符串">
@@ -175,10 +175,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-01-25 09:38:07 / 修改时间：10:38:26" itemprop="dateCreated datePublished" datetime="2021-01-25T09:38:07+08:00">2021-01-25</time>
+              <time title="创建时间：2021-01-25 09:38:07" itemprop="dateCreated datePublished" datetime="2021-01-25T09:38:07+08:00">2021-01-25</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-27 12:23:36" itemprop="dateModified" datetime="2021-01-27T12:23:36+08:00">2021-01-27</time>
+              </span>
 
           
             <div class="post-description">LeetCode 春招学习计划II 笔记</div>
@@ -192,7 +198,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="字符串简介">字符串简介</h2>
+        <h1 id="字符串">字符串</h1>
+<h2 id="字符串简介">字符串简介</h2>
 <blockquote>
 <p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/字符串">维基百科</a>：字符串是由零个或多个字符组成的有限序列。一般记为 s = a1a2...an。它是编程语言中表示文本的数据类型。</p>
 </blockquote>
@@ -247,7 +254,62 @@
 <li>如果你确实希望你的字符串是可变的，则可以使用 <code>toCharArray</code> 将其转换为字符数组。</li>
 <li>如果你经常必须连接字符串，最好使用一些其他的数据结构，如 <code>StringBuilder</code> 。</li>
 </ul>
-<p>转载自<a target="_blank" rel="noopener" href="https://leetcode-cn.com/leetbook/read/array-and-string/c9lnm/">数组和字符串</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/leetbook/read/array-and-string/c9lnm/">数组和字符串</a></p>
+<h2 id="字符串题目模式识别">字符串题目模式识别</h2>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/leetbook/read/learn-data-sturcture-in-7-chapters/xldgfv/">字符串</a></p>
+<p>字符串是由 0 个或多个字符或符号的顺序排列所组成的复合数据结构，简称「串」（string）。字符串长度是指一个字符串所包含的字符个数，空串特指长度为零的串。字符串也是具有线性特征的一种数据结构。在实际应用中，字符串是最基本的语言信息储存方式，并且其相关操作比较直观。</p>
+<p>在业界，常量字符串通常被用于哈希表（散列表），作为哈希表（散列表）的键。此外，几乎所有用户界面的文字提示都是字符串的形式，这是字符串最重要的应用场景。为了满足不过国家地区有不同语言的应用常见，我们会对字符串进行所谓的 i18n 操作。 就是对字符串进行本地化，把它自动翻译成当地语言，满足不同语言的需求。</p>
+<h3 id="匹配算法">匹配算法</h3>
+<h4 id="子串的概念">子串的概念</h4>
+<p>原字符串中连续的若干个字符</p>
+<h4 id="匹配算法-1">匹配算法</h4>
+<p>暴力法</p>
+<p>Rabin-Karp</p>
+<p>KMP</p>
+<h5 id="暴力法">暴力法</h5>
+<p>双指针</p>
+<p>向后逐一移动</p>
+<h5 id="rabin-karp">Rabin-Karp</h5>
+<p>计算子串散列值（比如可以为英文字母在字母表中的顺序之和）</p>
+<p>动态计算母串散列值</p>
+<p>只有当散列值相同时，再逐一比较（暴力法）</p>
+<p>平均时间复杂度 <span class="math inline">\(O(m+n)\)</span></p>
+<h3 id="操作特性">操作特性</h3>
+<p>简便存储语言信息</p>
+<p>相对容易操作</p>
+<h3 id="业界应用">业界应用</h3>
+<p>散列表的键</p>
+<p>用户界面文字提示</p>
+<p>i18n</p>
+<h3 id="模式识别">模式识别</h3>
+<h4 id="字符串操作">字符串操作</h4>
+<p>字符串本身操作</p>
+<p>字符串与数字转化</p>
+<h5 id="leetcode高频题">LeetCode高频题</h5>
+<p>151，186，344，833，890，459，686，273，13，8</p>
+<p>557.反转字符串中的单词III</p>
+<p>12.整数转罗马数字</p>
+<h4 id="出现次数">出现次数</h4>
+<p>散列表</p>
+<p>动态移动窗口</p>
+<h5 id="leetcode高频题-1">LeetCode高频题</h5>
+<p>340，929，76，159，992</p>
+<h4 id="递归构造">递归构造</h4>
+<p>计算子串</p>
+<p>加入当前字符</p>
+<p>合并结果</p>
+<h5 id="leetcode高频题-2">LeetCode高频题</h5>
+<p>20，93，22，91，47</p>
+<p>17.电话号码的字母组合——回溯</p>
+<h3 id="工具箱">工具箱</h3>
+<p><strong>C++标准库</strong></p>
+<p><code>class string</code></p>
+<p><strong>常用函数</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">size/length()</span><br><span class="line">[]/at()</span><br><span class="line">append/+=</span><br><span class="line">insert</span><br><span class="line">erase</span><br><span class="line">replace</span><br><span class="line">substr</span><br><span class="line">compare</span><br></pre></td></tr></table></figure>
+<h3 id="kmp算法">KMP算法</h3>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/leetbook/read/array-and-string/cpoo6/">（选修）字符串匹配算法：KMP</a></p>
+<h4 id="实现-strstr">实现 strStr()</h4>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/implement-strstr/solution/shi-xian-strstr-by-leetcode/">题目与题解</a></p>
 
     </div>
 
@@ -333,7 +395,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">字符串简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BD%95%E5%8D%95%E7%8B%AC%E8%AE%A8%E8%AE%BA%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">为何单独讨论字符串类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E5%AF%B9%E8%B1%A1%E9%80%9A%E5%B8%B8%E6%98%AF%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%95%B4%E4%BD%93%E6%88%96%E8%80%85%E5%85%B6%E5%AD%90%E4%B8%B2"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.字符串的基本操作对象通常是字符串整体或者其子串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C%E6%AF%94%E5%85%B6%E4%BB%96%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%9B%B4%E5%A4%8D%E6%9D%82%E4%BE%8B%E5%A6%82%E6%AF%94%E8%BE%83%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 字符串操作比其他数据类型更复杂（例如比较、连接操作）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">比较函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">连接操作</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.</span> <span class="nav-text">字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.</span> <span class="nav-text">字符串简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BD%95%E5%8D%95%E7%8B%AC%E8%AE%A8%E8%AE%BA%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.1.</span> <span class="nav-text">为何单独讨论字符串类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E5%AF%B9%E8%B1%A1%E9%80%9A%E5%B8%B8%E6%98%AF%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%95%B4%E4%BD%93%E6%88%96%E8%80%85%E5%85%B6%E5%AD%90%E4%B8%B2"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1.字符串的基本操作对象通常是字符串整体或者其子串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C%E6%AF%94%E5%85%B6%E4%BB%96%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%9B%B4%E5%A4%8D%E6%9D%82%E4%BE%8B%E5%A6%82%E6%AF%94%E8%BE%83%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">2. 字符串操作比其他数据类型更复杂（例如比较、连接操作）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E5%87%BD%E6%95%B0"><span class="nav-number">1.1.2.</span> <span class="nav-text">比较函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.3.</span> <span class="nav-text">连接操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%A2%98%E7%9B%AE%E6%A8%A1%E5%BC%8F%E8%AF%86%E5%88%AB"><span class="nav-number">1.2.</span> <span class="nav-text">字符串题目模式识别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="nav-number">1.2.1.</span> <span class="nav-text">匹配算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%90%E4%B8%B2%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">子串的概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-1"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">匹配算法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9A%B4%E5%8A%9B%E6%B3%95"><span class="nav-number">1.2.1.2.1.</span> <span class="nav-text">暴力法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#rabin-karp"><span class="nav-number">1.2.1.2.2.</span> <span class="nav-text">Rabin-Karp</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%89%B9%E6%80%A7"><span class="nav-number">1.2.2.</span> <span class="nav-text">操作特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9A%E7%95%8C%E5%BA%94%E7%94%A8"><span class="nav-number">1.2.3.</span> <span class="nav-text">业界应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E8%AF%86%E5%88%AB"><span class="nav-number">1.2.4.</span> <span class="nav-text">模式识别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">字符串操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#leetcode%E9%AB%98%E9%A2%91%E9%A2%98"><span class="nav-number">1.2.4.1.1.</span> <span class="nav-text">LeetCode高频题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%BA%E7%8E%B0%E6%AC%A1%E6%95%B0"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">出现次数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#leetcode%E9%AB%98%E9%A2%91%E9%A2%98-1"><span class="nav-number">1.2.4.2.1.</span> <span class="nav-text">LeetCode高频题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E6%9E%84%E9%80%A0"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">递归构造</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#leetcode%E9%AB%98%E9%A2%91%E9%A2%98-2"><span class="nav-number">1.2.4.3.1.</span> <span class="nav-text">LeetCode高频题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E7%AE%B1"><span class="nav-number">1.2.5.</span> <span class="nav-text">工具箱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kmp%E7%AE%97%E6%B3%95"><span class="nav-number">1.2.6.</span> <span class="nav-text">KMP算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0-strstr"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">实现 strStr()</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -347,7 +409,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
